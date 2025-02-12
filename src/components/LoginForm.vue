@@ -29,7 +29,7 @@
 <script>
 import { useUserStore } from '@/store/user';
 import { useRouter } from 'vue-router';
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 
 export default {
   setup() {
@@ -37,6 +37,14 @@ export default {
     const router = useRouter();
     const userId = ref('');
     const errorMessage = ref('');
+
+    // Cargar usuario si está guardado
+    onMounted(() => {
+      userStore.loadUser();
+      if (userStore.userId) {
+        router.push('/dashboard'); // Redirigir si ya está logueado
+      }
+    });
 
     const handleLogin = () => {
       if (!/^[a-zA-Z0-9]+$/.test(userId.value)) {

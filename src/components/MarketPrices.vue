@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <!-- <div>
     <h2 class="text-xl font-bold mb-4">Market Prices</h2>
     <button @click="loadCryptoPrices" class="bg-blue-500 text-white px-4 py-2 rounded mb-4">
       Refresh
@@ -26,29 +26,28 @@
         </tr>
       </tbody>
     </table>
-  </div>
+  </div> -->
 </template>
 
 <script>
-import { useCryptoStore } from "@/store/cryptoStore";
-import { onMounted } from "vue";
+//  import { onMounted } from "vue";
 
-export default {
-  setup() {
-    const store = useCryptoStore();
-    const { data, loadCryptoPrices, loading, error } = store;
+//  export default {
+//   setup() {
+//     const store = useCryptoStore();
+//     const { data, loadCryptoPrices, loading, error } = store;
 
-    onMounted(() => {
-      loadCryptoPrices();
-    });
+//     onMounted(() => {
+//       loadCryptoPrices();
+//     });
 
-    return { data, loadCryptoPrices, loading, error };
-  }
-};
+//     return { data, loadCryptoPrices, loading, error };
+//   }
+// };
 </script>
 
 <style scoped>
-table {
+/* table {
   width: 100%;
   border-collapse: collapse;
 }
@@ -59,5 +58,5 @@ th, td {
 }
 th {
   background-color: #f4f4f4;
-}
+} */
 </style>

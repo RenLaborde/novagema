@@ -1,5 +1,5 @@
 <template>
-  <div class="dashboard">
+  <div class="dashboard" v-if="userId">
     <Logo />
     <h2>Welcome</h2>
     <p>Your user ID: {{ userId }}</p>
@@ -16,20 +16,34 @@
 
     <router-view />  
   </div>
+
+  <div v-else class="loading">
+    <p>Loading...</p>
+  </div>
 </template>
 
 <script>
 import { useUserStore } from '@/store/user';
 import { useRouter } from 'vue-router';
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
+import Logo from '@/components/Logo.vue'; 
 
 export default {
+  components: { Logo },
+
   setup() {
     const userStore = useUserStore();
     const userId = computed(() => userStore.userId);
     const router = useRouter();
 
+    onMounted(() => {
+      if (!userStore.userId) {
+        router.push('/');
+      }
+    });
+
     const goToLogin = () => {
+      userStore.logout();
       router.push('/');
     };
 
@@ -66,5 +80,12 @@ nav ul li a, button {
 
 nav ul li a:hover, button:hover {
   text-decoration: underline;
+}
+
+.loading {
+  text-align: center;
+  padding: 50px;
+  font-size: 18px;
+  font-weight: bold;
 }
 </style>
