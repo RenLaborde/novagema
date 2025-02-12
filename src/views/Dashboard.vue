@@ -7,7 +7,7 @@
     <nav>
       <ul>
         <li><button @click="goToLogin">Back to Login</button></li>
-        <li><router-link to="/dashboard/trading">Trading</router-link></li>
+        <li><router-link to="/dashboard/transactions">Transactions</router-link></li>
         <li><router-link to="/dashboard/marketprices">Market Prices</router-link></li>
         <li><router-link to="/dashboard/history">History</router-link></li>
         <li><router-link to="/dashboard/investments">Investments</router-link></li>
@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import { useUserStore } from '@/stores/user';
+import { useUserStore } from '@/store/user';
 import { useRouter } from 'vue-router';
 import { computed } from 'vue';
 

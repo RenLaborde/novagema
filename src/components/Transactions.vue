@@ -1,5 +1,5 @@
 <template>
-    <div class="trading">
+    <div class="transactions">
       <form @submit.prevent="handleTransaction">
     
         <label for="transactionType">Transaction Type:</label>
@@ -81,7 +81,7 @@
   </script>
   
   <style scoped>
-  .trading-form {
+  .transactions-form {
     max-width: 400px;
     margin: 0 auto;
     padding: 20px;

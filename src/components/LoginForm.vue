@@ -2,17 +2,18 @@
   <div class="container d-flex justify-content-center align-items-center vh-100">
     <div class="card p-4 shadow-lg" style="width: 400px;">
       <h2 class="text-center mb-4">Login</h2>
-      <p class="text-muted text-center">Please, enter your Alphanumeric ID and Password</p>
+      <p class="text-muted text-center">Enter your Alphanumeric ID</p>
       
       <form @submit.prevent="handleLogin">
         <div class="mb-3">
           <label for="userId" class="form-label">Alphanumeric ID</label>
-          <input type="text" id="userId" v-model="userId" class="form-control" required />
-        </div>
-
-        <div class="mb-3">
-          <label for="password" class="form-label">Password</label>
-          <input type="password" id="password" v-model="password" class="form-control" required />
+          <input 
+            type="text" 
+            id="userId" 
+            v-model="userId" 
+            class="form-control" 
+            required 
+          />
         </div>
 
         <button type="submit" class="btn btn-primary w-100">Log In</button>
@@ -26,7 +27,7 @@
 </template>
 
 <script>
-import { useUserStore } from '@/stores/user';
+import { useUserStore } from '@/store/user';
 import { useRouter } from 'vue-router';
 import { ref } from 'vue';
 
@@ -35,7 +36,6 @@ export default {
     const userStore = useUserStore();
     const router = useRouter();
     const userId = ref('');
-    const password = ref('');
     const errorMessage = ref('');
 
     const handleLogin = () => {
@@ -44,14 +44,11 @@ export default {
         return;
       }
 
-      if (userStore.login(userId.value, password.value)) {
-        router.push('/dashboard'); // Redirige si el login es exitoso
-      } else {
-        errorMessage.value = 'Incorrect username or password';
-      }
+      userStore.login(userId.value);
+      router.push('/dashboard'); // Redirect to main page
     };
 
-    return { userId, password, errorMessage, handleLogin };
+    return { userId, errorMessage, handleLogin };
   }
 };
 </script>

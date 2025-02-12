@@ -12,7 +12,7 @@
 
 <script>
 import apiClient from '@/services/apiClient';
-import { useUserStore } from '@/stores/user';
+import { useUserStore } from '@/store/user';
 
 export default {
   setup() {

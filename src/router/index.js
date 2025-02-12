@@ -1,11 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import LoginForm from '@/views/LoginView.vue';
 import Dashboard from '@/views/Dashboard.vue';
-import Trading from '@/components/Trading.vue';
+import Transactions from '@/components/Transactions.vue';
 import History from '@/components/History.vue';
 import MarketPrices from '@/components/MarketPrices.vue';
 import Investments from '@/components/Investments.vue';
-import { useUserStore } from '@/stores/user';
+import { useUserStore } from '@/store/user';
 
 const routes = [
   { path: '/', name: 'Home', component: LoginForm },
@@ -15,13 +15,12 @@ const routes = [
     component: Dashboard, 
     meta: { requiresAuth: true },
     children: [
-      { path: 'trading', name: 'Trading', component: Trading },
+      { path: 'transactions', name: 'Transactions', component: Transactions },
       { path: 'history', name: 'History', component: History },
       { path: 'marketprices', name: 'MarketPrices', component: MarketPrices },
       { path: 'investments', name: 'Investments', component: Investments },
     ]
   }
-
 ];
 
 const router = createRouter({
