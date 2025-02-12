@@ -9,10 +9,12 @@
     <button @click="loadHistory">Refresh</button>
   </div>
 </template>
-
+// conectar con user id, console log
 <script>
 import apiClient from '@/services/apiClient';
 import { useUserStore } from '@/store/user';
+
+// hacer crud get, post, put, delete
 
 export default {
   setup() {
@@ -30,6 +32,7 @@ export default {
   methods: {
     async loadHistory() {
       try {
+      console.log(this.userStore.userId);
         const response = await apiClient.get(`/transactions?q={"user_id": "${this.userStore.userId}"}`);
         this.transactions = response.data;
       } catch (error) {
