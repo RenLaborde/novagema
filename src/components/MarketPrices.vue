@@ -1,62 +1,87 @@
 <template>
-  <!-- <div>
-    <h2 class="text-xl font-bold mb-4">Market Prices</h2>
-    <button @click="loadCryptoPrices" class="bg-blue-500 text-white px-4 py-2 rounded mb-4">
-      Refresh
-    </button>
-
-    <div v-if="loading">Loading...</div>
-    <div v-if="error" class="text-red-500">{{ error }}</div>
-
-    <table v-if="!loading && data.length > 0" class="w-full border-collapse border border-gray-300">
+  <div>
+    <button @click="fetchCryptoPrices">Refresh</button>
+    <input v-model="searchQuery" placeholder="Search exchange..." />
+    <table>
       <thead>
-        <tr class="bg-gray-200">
-          <th class="border p-2">Exchange</th>
-          <th class="border p-2">Crypto</th>
-          <th class="border p-2">Buying Price (Ask)</th>
-          <th class="border p-2">Selling Price (Bid)</th>
+        <tr>
+          <th>Exchange</th>
+          <th>Buy Price (ARS)</th>
+          <th>Sell Price (ARS)</th>
+          <th>Buy (Total)</th>
+          <th>Sell (Total)</th>
+          <th>Updated</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(row, index) in data" :key="index">
-          <td class="border p-2">{{ row.exchange }}</td>
-          <td class="border p-2">{{ row.coin }}</td>
-          <td class="border p-2">{{ row.ask }}</td>
-          <td class="border p-2">{{ row.bid }}</td>
+        <tr v-for="(price, exchange) in filteredPrices" :key="exchange">
+          <td>{{ exchange }}</td>
+          <td>{{ price.bid }}</td>
+          <td>{{ price.ask }}</td>
+          <td>{{ price.totalBid }}</td>
+          <td>{{ price.totalAsk }}</td>
+          <td>{{ formatDate(price.time) }}</td>
         </tr>
       </tbody>
     </table>
-  </div> -->
+  </div>
 </template>
 
 <script>
-//  import { onMounted } from "vue";
-
-//  export default {
-//   setup() {
-//     const store = useCryptoStore();
-//     const { data, loadCryptoPrices, loading, error } = store;
-
-//     onMounted(() => {
-//       loadCryptoPrices();
-//     });
-
-//     return { data, loadCryptoPrices, loading, error };
-//   }
-// };
+export default {
+  data() {
+    return {
+      prices: {},
+      searchQuery: "" // Para el filtro de búsqueda
+    };
+  },
+  computed: {
+    filteredPrices() {
+      // Si no hay filtro, se muestran todas las cotizaciones
+      if (!this.searchQuery) return this.prices;
+      
+      // Si hay filtro, se muestra solo las que coinciden con el nombre del exchange
+      return Object.fromEntries(
+        Object.entries(this.prices).filter(([exchange]) =>
+          exchange.toLowerCase().includes(this.searchQuery.toLowerCase())
+        )
+      );
+    }
+  },
+  methods: {
+    async fetchCryptoPrices() {
+      try {
+        // Se obtiene la información de la API
+        const response = await fetch("https://criptoya.com/api/btc/ars");
+        this.prices = await response.json(); // Se guarda en la variable 'prices'
+      } catch (error) {
+        console.error("Error fetching crypto prices:", error);
+      }
+    },
+    formatDate(timestamp) {
+      // Se convierte la fecha en formato legible
+      return new Date(timestamp * 1000).toLocaleString();
+    }
+  }
+};
 </script>
 
 <style scoped>
-/* table {
+table {
   width: 100%;
   border-collapse: collapse;
 }
 th, td {
   border: 1px solid #ddd;
   padding: 8px;
-  text-align: center;
+  text-align: left;
 }
-th {
-  background-color: #f4f4f4;
-} */
+button {
+  margin-bottom: 10px;
+  padding: 5px 10px;
+}
+input {
+  margin-bottom: 10px;
+  padding: 5px;
+}
 </style>
