@@ -21,7 +21,6 @@ const routes = [
       { path: 'investments', name: 'Investments', component: Investments },
     ]
   }
-
 ];
 
 const router = createRouter({

@@ -1,7 +1,6 @@
 <template>
   <div class="dashboard">
-    <Logo />
-    <h2>Welcome</h2>
+    <h2>Welcome to Novagema</h2>
     <p>Your user ID: {{ userId }}</p>
     
     <nav>
@@ -14,7 +13,7 @@
       </ul>
     </nav>
 
-    <router-view />  
+    <router-view /> <!-- Aquí se cargarán las subrutas del dashboard -->
   </div>
 </template>
 
