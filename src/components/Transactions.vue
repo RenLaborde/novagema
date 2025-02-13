@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import { getCryptoPrice } from '@/services/apiClient';
+import { createTransaction, getCryptoPrice } from '@/services/apiClient';
 
 export default {
   data() {
@@ -90,8 +90,14 @@ export default {
         datetime: this.datetime,
       };
 
-      console.log('Transaction confirmed:', transactionData);
-      alert('Transaction successfully confirmed!');
+      try {
+        const response = await createTransaction(transactionData);
+        console.log('Transaction confirmed:', response);
+        alert('Transaction successfully confirmed!');
+      } catch (error) {
+        console.error('Error confirming transaction:', error);
+        alert('Failed to confirm transaction.');
+      }
     }
   },
   created() {

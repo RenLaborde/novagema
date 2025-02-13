@@ -1,71 +1,89 @@
 <template>
-  <div>
-    <h1 class="text-2xl font-bold mb-4">Transaction History</h1>
-    <div v-if="transactions.length" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <div v-for="transaction in transactions" :key="transaction.id" class="p-4 rounded-lg shadow-lg"
-        :class="transaction.type === 'buy' ? 'bg-green-100' : 'bg-red-100'">
-        <h2 class="text-lg font-semibold">{{ transaction.crypto }} - {{ transaction.amount }} {{ transaction.currency }}</h2>
-        <p class="text-gray-600">{{ formatDate(transaction.date) }}</p>
-        <p class="text-gray-800">Type: {{ transaction.type }}</p>
-        <div class="mt-2 flex gap-2">
-          <button class="bg-blue-500 text-white px-3 py-1 rounded" @click="editTransaction(transaction)">Edit</button>
-          <button class="bg-red-500 text-white px-3 py-1 rounded" @click="deleteTransaction(transaction.id)">Delete</button>
-        </div>
+  <div class="history">
+    <h2>Transaction History</h2>
+    <div v-if="transactions.length > 0">
+      <div v-for="transaction in transactions" :key="transaction._id" class="transaction-item">
+        <p><strong>Type:</strong> {{ transaction.action === 'purchase' ? 'Buy' : 'Sell' }}</p>
+        <p><strong>Cryptocurrency:</strong> {{ transaction.crypto_code.toUpperCase() }}</p>
+        <p><strong>Amount:</strong> {{ transaction.crypto_amount }}</p>
+        <p><strong>Amount in ARS:</strong> {{ transaction.money }}</p>
+        <p><strong>Date:</strong> {{ new Date(transaction.datetime).toLocaleString() }}</p>
+        <button @click="editTransaction(transaction)">Edit</button>
+        <button @click="deleteTransaction(transaction._id)">Delete</button>
       </div>
     </div>
-    <p v-else class="text-gray-500">No transactions found.</p>
-
-    <!-- Edit Modal -->
-    <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-      <div class="bg-white p-6 rounded-lg shadow-lg">
-        <h2 class="text-xl font-bold mb-4">Edit Transaction</h2>
-        <input v-model="selectedTransaction.crypto" class="border p-2 w-full mb-2" placeholder="Crypto">
-        <input v-model="selectedTransaction.amount" class="border p-2 w-full mb-2" type="number" placeholder="Amount">
-        <select v-model="selectedTransaction.type" class="border p-2 w-full mb-2">
-          <option value="buy">Buy</option>
-          <option value="sell">Sell</option>
-        </select>
-        <div class="flex gap-2 mt-4">
-          <button class="bg-green-500 text-white px-3 py-1 rounded" @click="saveTransaction">Save</button>
-          <button class="bg-gray-500 text-white px-3 py-1 rounded" @click="showModal = false">Cancel</button>
-        </div>
-      </div>
+    <div v-else>
+      <p>No transactions found.</p>
     </div>
   </div>
 </template>
 
 <script>
+// Importamos apiClient desde el archivo services/apiClient.js
+import apiClient from '@/services/apiClient';
+
 export default {
   data() {
     return {
-      transactions: [
-        { id: 1, crypto: 'BTC', amount: 0.5, currency: 'USD', date: '2024-02-10', type: 'buy' },
-        { id: 2, crypto: 'ETH', amount: 2, currency: 'USD', date: '2024-02-09', type: 'sell' }
-      ],
-      showModal: false,
-      selectedTransaction: null
+      transactions: [],
     };
   },
   methods: {
-    formatDate(date) {
-      return new Date(date).toLocaleDateString();
+    // Fetch transactions desde el servidor
+    async fetchTransactions() {
+      try {
+        const response = await apiClient.get('/transactions');
+        this.transactions = response.data;
+      } catch (error) {
+        console.error('Error fetching transactions:', error.message);
+      }
     },
+    // Función para eliminar transacción
+    async deleteTransaction(id) {
+      try {
+        await apiClient.delete(`/transactions/${id}`);
+        this.fetchTransactions(); // Recargamos la lista de transacciones
+        alert('Transaction deleted successfully!');
+      } catch (error) {
+        console.error('Error deleting transaction:', error.message);
+        alert('Failed to delete transaction.');
+      }
+    },
+    // Función para editar transacción
     editTransaction(transaction) {
-      this.selectedTransaction = { ...transaction };
-      this.showModal = true;
-    },
-    saveTransaction() {
-      const index = this.transactions.findIndex(t => t.id === this.selectedTransaction.id);
-      if (index !== -1) this.transactions[index] = { ...this.selectedTransaction };
-      this.showModal = false;
-    },
-    deleteTransaction(id) {
-      this.transactions = this.transactions.filter(t => t.id !== id);
+      console.log('Editing transaction:', transaction);
+      // Aquí va la lógica para editar la transacción
     }
+  },
+  created() {
+    this.fetchTransactions(); // Cargar las transacciones cuando el componente se monte
   }
 };
 </script>
 
 <style scoped>
-/* Add your custom styles here */
+/* Estilos para el historial de transacciones */
+.history {
+  max-width: 600px;
+  margin: auto;
+  padding: 20px;
+}
+
+.transaction-item {
+  margin-bottom: 20px;
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #f9f9f9;
+}
+
+button {
+  margin-top: 10px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #ddd;
+}
 </style>
