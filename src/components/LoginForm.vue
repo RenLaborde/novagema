@@ -39,8 +39,8 @@ export default {
     const errorMessage = ref('');
 
     // Cargar usuario si está guardado
-    onMounted(() => {
-      userStore.loadUser();
+    onMounted(() => {   
+      userId.value = userStore.userId || '';
       if (userStore.userId) {
         router.push('/dashboard'); // Redirigir si ya está logueado
       }

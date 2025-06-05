@@ -5,10 +5,10 @@
   </template>
   
   <script setup>
-  import logo from '@/assets/logo.png';
+  import logo from '@/assets/logo.png'; // arreglar cómo se ve
   </script>
   
-  <style scoped>
+  <style scoped> 
   .logo {
     position: fixed;
     top: 10px;
