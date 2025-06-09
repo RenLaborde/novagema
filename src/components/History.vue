@@ -8,11 +8,44 @@
         :key="transaction._id"
         class="transaction-item"
       >
-        <p><strong>Type:</strong> {{ transaction.action === 'purchase' ? 'Buy' : 'Sell' }}</p>
-        <p><strong>Crypto:</strong> {{ transaction.crypto_code?.toUpperCase() }}</p>
-        <p><strong>Amount:</strong> {{ transaction.crypto_amount }}</p>
-        <p><strong>ARS:</strong> {{ transaction.money }}</p>
-        <p><strong>Date:</strong> {{ formatDate(transaction.datetime) }}</p>
+        <template v-if="editMode && editData._id === transaction._id">
+          <h3>Edit Transaction</h3>
+          <label>Type:
+            <select v-model="editData.action">
+              <option value="purchase">Buy</option>
+              <option value="sale">Sell</option>
+            </select>
+          </label>
+          <label>Crypto:
+            <select v-model="editData.crypto_code">
+              <option value="btc">BTC</option>
+              <option value="eth">ETH</option>
+              <option value="usdc">USDC</option>
+            </select>
+          </label>
+          <label>Amount:
+            <input v-model.number="editData.crypto_amount" type="number" />
+          </label>
+          <label>ARS:
+            <input v-model.number="editData.money" type="number" />
+          </label>
+          <label>Date:
+            <input v-model="editData.datetime" type="datetime-local" />
+          </label>
+          <button @click="saveEdit">Save</button>
+          <button @click="cancelEdit">Cancel</button>
+        </template>
+
+        <template v-else>
+          <p><strong>Type:</strong> {{ transaction.action === 'purchase' ? 'Buy' : 'Sell' }}</p>
+          <p><strong>Crypto:</strong> {{ transaction.crypto_code?.toUpperCase() }}</p>
+          <p><strong>Amount:</strong> {{ transaction.crypto_amount }}</p>
+          <p><strong>ARS:</strong> {{ transaction.money }}</p>
+          <p><strong>Date:</strong> {{ formatDate(transaction.datetime) }}</p>
+
+          <button @click="editTransaction(transaction)">Edit</button>
+          <button @click="deleteTransaction(transaction._id)">Delete</button>
+        </template>
       </div>
 
       <div class="pagination">
@@ -29,7 +62,7 @@
 </template>
 
 <script>
-import { getUserTransactions } from '@/services/apiClient';
+import { getUserTransactions, deleteTransactionById, patchTransactionById } from '@/services/apiClient';
 import { useUserStore } from '@/store/user';
 
 export default {
@@ -38,6 +71,8 @@ export default {
       transactions: [],
       currentPage: 1,
       transactionsPerPage: 5,
+      editMode: false,
+      editData: {},
     };
   },
   computed: {
@@ -75,6 +110,40 @@ export default {
     formatDate(dateStr) {
       return new Date(dateStr).toLocaleString();
     },
+    async deleteTransaction(id) {
+      if (!confirm('Are you sure you want to delete this transaction?')) return;
+      try {
+        await deleteTransactionById(id);
+        this.fetchTransactions();
+      } catch (error) {
+        console.error('Error deleting transaction:', error);
+      }
+    },
+    editTransaction(transaction) {
+      this.editData = {
+        ...transaction,
+        datetime: new Date(transaction.datetime).toISOString().slice(0, 16), // para input datetime-local
+      };
+      this.editMode = true;
+    },
+    async saveEdit() {
+      try {
+        const updated = {
+          ...this.editData,
+          datetime: new Date(this.editData.datetime).toISOString(),
+        };
+        await patchTransactionById(this.editData._id, updated);
+        this.editMode = false;
+        this.editData = {};
+        this.fetchTransactions();
+      } catch (error) {
+        console.error('Error saving transaction:', error);
+      }
+    },
+    cancelEdit() {
+      this.editMode = false;
+      this.editData = {};
+    },
   },
   created() {
     this.fetchTransactions();
@@ -100,5 +169,17 @@ export default {
   justify-content: center;
   gap: 10px;
   margin-top: 20px;
+}
+button {
+  margin-right: 10px;
+}
+.edit-form label {
+  display: block;
+  margin-bottom: 10px;
+}
+.edit-form input,
+.edit-form select {
+  width: 100%;
+  padding: 5px;
 }
 </style>

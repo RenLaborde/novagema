@@ -5,6 +5,7 @@ const apiClient = axios.create({
   baseURL: "https://labor3-d60e.restdb.io/rest/",
   headers: {
     "x-apikey": "64a2e9bc86d8c525a3ed8f63",
+    "Content-Type": "application/json",
   },
 });
 
@@ -23,7 +24,7 @@ export const createTransaction = async (transaction) => {
   }
 };
 
-// 🆕 Obtiene las transacciones de un usuario
+// Obtiene las transacciones de un usuario
 export const getUserTransactions = async (userId) => {
   if (!userId) {
     throw new Error("User ID is required.");
@@ -38,7 +39,37 @@ export const getUserTransactions = async (userId) => {
   }
 };
 
-// Obtiene el precio actual de la criptomoneda desde CriptoYa
+// Edita (parcialmente) una transacción por ID
+export const patchTransactionById = async (id, data) => {
+  if (!id || !data) {
+    throw new Error("ID and data are required for patch.");
+  }
+
+  try {
+    const response = await apiClient.patch(`/transactions/${id}`, data);
+    return response.data;
+  } catch (error) {
+    console.error("Error patching transaction:", error.response?.data || error.message);
+    throw new Error("Error updating the transaction.");
+  }
+};
+
+// Elimina una transacción por ID
+export const deleteTransactionById = async (id) => {
+  if (!id) {
+    throw new Error("Transaction ID is required.");
+  }
+
+  try {
+    const response = await apiClient.delete(`/transactions/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting transaction:", error.response?.data || error.message);
+    throw new Error("Error deleting the transaction.");
+  }
+};
+
+// Obtiene el precio actual de una criptomoneda desde CriptoYa
 export const getCryptoPrice = async (cryptoCode) => {
   if (!cryptoCode) {
     throw new Error("Invalid cryptocurrency code.");
@@ -59,5 +90,5 @@ export const getCryptoPrice = async (cryptoCode) => {
   }
 };
 
-// Exportación por defecto para otros usos (ej. .get, .post genéricos)
+// Exportación por defecto para uso genérico si lo necesitás
 export default apiClient;
