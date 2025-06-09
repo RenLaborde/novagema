@@ -1,4 +1,4 @@
-<template> 
+<template>
   <div class="container">
     <h2>Real-Time Crypto Prices at Your Fingertips!</h2>
     <input v-model="searchQuery" placeholder="Search exchange..." class="search-input" />
@@ -14,8 +14,8 @@
       <tbody>
         <tr v-for="(price, exchange) in filteredPrices" :key="exchange">
           <td>{{ exchange }}</td>
-          <td class="buy-price">{{ formatPrice(price.bid) }}</td>
-          <td class="sell-price">{{ formatPrice(price.ask) }}</td>
+          <td class="buy-price">{{ price.bid }}</td>
+          <td class="sell-price">{{ price.ask }}</td>
           <td>{{ formatDate(price.time) }}</td>
         </tr>
       </tbody>
@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, onUnmounted } from "vue"; 
+import { ref, computed, onMounted, onUnmounted } from "vue";
 
 export default {
   setup() {
@@ -59,10 +59,6 @@ export default {
       return new Date(timestamp * 1000).toLocaleString();
     };
 
-    const formatPrice = (price) => {
-      return price ? new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS" }).format(price) : "N/A";
-    };
-
     onMounted(() => {
       fetchCryptoPrices();
       intervalId = setInterval(fetchCryptoPrices, 60000); // Actualiza cada 60 segundos
@@ -72,7 +68,7 @@ export default {
       if (intervalId) clearInterval(intervalId);
     });
 
-    return { prices, searchQuery, filteredPrices, formatDate, formatPrice, error };
+    return { prices, searchQuery, filteredPrices, formatDate, error };
   }
 };
 </script>

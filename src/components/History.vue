@@ -17,11 +17,7 @@
             </select>
           </label>
           <label>Crypto:
-            <select v-model="editData.crypto_code">
-              <option value="btc">BTC</option>
-              <option value="eth">ETH</option>
-              <option value="usdc">USDC</option>
-            </select>
+            <input v-model="editData.crypto_code" />
           </label>
           <label>Amount:
             <input v-model.number="editData.crypto_amount" type="number" />

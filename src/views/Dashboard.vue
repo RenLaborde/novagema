@@ -10,7 +10,7 @@
         <li><router-link to="/dashboard/transactions">Transactions</router-link></li>
         <li><router-link to="/dashboard/marketprices">Market Prices</router-link></li>
         <li><router-link to="/dashboard/history">History</router-link></li> 
-        <li><router-link to="/dashboard/investments">Investments</router-link></li>
+        <li><router-link to="/dashboard/analysis">Analysis</router-link></li>
       </ul>
     </nav>
 
