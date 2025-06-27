@@ -41,7 +41,9 @@
 </template>
 
 <script>
-import { getCryptoPrice } from '@/services/apiClient';
+import { getCryptoPrices, createTransaction} from '@/services/apiClient';
+import { useUserStore } from '@/store/user';
+
 
 export default {
   data() {
@@ -65,35 +67,44 @@ export default {
   methods: {
     async fetchCryptoPrice() {
       try {
-        this.cryptoPrice = await getCryptoPrice(this.cryptoCode);
+        this.cryptoPrice = await getCryptoPrices(this.cryptoCode);
       } catch (error) {
         console.error("Error fetching crypto price:", error.message);
         this.cryptoPrice = null;
       }
     },
+
     async confirmTransaction() {
-      if (this.cryptoAmount <= 0) {
-        alert('Enter a valid amount of cryptocurrency.');
-        return;
-      }
+    const userStore = useUserStore();
+    const userId = userStore.userId;
 
-      if (!this.datetime) {
-        alert('Please select a date and time for the transaction.');
-        return;
-      }
+    const transactionData = {
+      user_id: userId,
+      action: this.action,
+      crypto_code: this.cryptoCode,
+      crypto_amount: parseFloat(this.cryptoAmount),
+      money: parseFloat(this.calculatedMoney),
+      datetime: this.datetime,
+    };
 
-      const transactionData = {
-        action: this.action,
-        crypto_code: this.cryptoCode,
-        crypto_amount: parseFloat(this.cryptoAmount),
-        money: parseFloat(this.calculatedMoney),
-        datetime: this.datetime,
-      };
-
-      console.log('Transaction confirmed:', transactionData);
+    try {
+      await createTransaction(transactionData);
       alert('Transaction successfully confirmed!');
+      this.resetForm(); // sugerido
+    } catch (err) {
+      alert('Error submitting transaction');
+      console.error(err);
     }
   },
+
+  resetForm() {
+    this.cryptoCode = 'btc';
+    this.cryptoAmount = '';
+    this.datetime = '';
+    this.action = 'purchase';
+    this.cryptoPrice = null;
+  }
+},
   created() {
     this.fetchCryptoPrice();
   }

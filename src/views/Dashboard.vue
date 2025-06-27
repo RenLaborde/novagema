@@ -14,7 +14,8 @@
       </ul>
     </nav>
 
-    <router-view />  
+    <!-- Renderiza el componente hijo -->
+    <router-view />
   </div>
 
   <div v-else class="loading">
