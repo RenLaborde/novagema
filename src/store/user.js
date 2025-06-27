@@ -8,7 +8,7 @@ export const useUserStore = defineStore('user', {
   actions: {
     login(id) {
       this.userId = id.trim();
-      localStorage.setItem('user_id', this.userId);
+      localStorage.setItem('user_id', this.userId, );
     },
 
     logout() {

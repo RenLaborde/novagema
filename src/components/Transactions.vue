@@ -41,22 +41,23 @@
 </template>
 
 <script>
-import { createTransaction, getCryptoPrice } from "@/services/apiClient";
-import { useUserStore } from "../store/user";
+import { getCryptoPrices, createTransaction} from '@/services/apiClient';
+import { useUserStore } from '@/store/user';
+
 
 export default {
   data() {
     return {
-      cryptoCode: "btc",
-      cryptoAmount: "",
+      cryptoCode: 'btc',
+      cryptoAmount: '',
       cryptoPrice: null,
-      datetime: new Date().toISOString().slice(0, 16),
-      action: "purchase",
+      datetime: '',
+      action: 'purchase',
     };
   },
   computed: {
     calculatedMoney() {
-      if (!this.cryptoAmount || !this.cryptoPrice) return "";
+      if (!this.cryptoAmount || !this.cryptoPrice) return '';
       return (this.cryptoAmount * this.cryptoPrice).toFixed(2);
     }
   },
@@ -66,50 +67,44 @@ export default {
   methods: {
     async fetchCryptoPrice() {
       try {
-        this.cryptoPrice = await getCryptoPrice(this.cryptoCode);
+        this.cryptoPrice = await getCryptoPrices(this.cryptoCode);
       } catch (error) {
         console.error("Error fetching crypto price:", error.message);
         this.cryptoPrice = null;
       }
     },
+
     async confirmTransaction() {
-      const userStore = useUserStore();
-      const userId = userStore.userId;
+    const userStore = useUserStore();
+    const userId = userStore.userId;
 
-      if (!userId) {
-        alert("No logged-in user.");
-        return;
-      }
+    const transactionData = {
+      user_id: userId,
+      action: this.action,
+      crypto_code: this.cryptoCode,
+      crypto_amount: parseFloat(this.cryptoAmount),
+      money: parseFloat(this.calculatedMoney),
+      datetime: this.datetime,
+    };
 
-      if (this.cryptoAmount <= 0) {
-        alert("Enter a valid amount of cryptocurrency.");
-        return;
-      }
-
-      if (!this.datetime) {
-        alert("Please select a date and time for the transaction.");
-        return;
-      }
-
-      const transactionData = {
-        user_id: userId,
-        action: this.action,
-        crypto_code: this.cryptoCode,
-        crypto_amount: parseFloat(this.cryptoAmount),
-        money: parseFloat(this.calculatedMoney),
-        datetime: new Date(this.datetime).toISOString(),
-      };
-
-      try {
-        const response = await createTransaction(transactionData);
-        console.log("Transaction confirmed:", response);
-        alert("Transaction successfully confirmed!");
-      } catch (error) {
-        console.error("Error confirming transaction:", error.response?.data || error.message);
-        alert("Failed to confirm transaction.");
-      }
+    try {
+      await createTransaction(transactionData);
+      alert('Transaction successfully confirmed!');
+      this.resetForm(); // sugerido
+    } catch (err) {
+      alert('Error submitting transaction');
+      console.error(err);
     }
   },
+
+  resetForm() {
+    this.cryptoCode = 'btc';
+    this.cryptoAmount = '';
+    this.datetime = '';
+    this.action = 'purchase';
+    this.cryptoPrice = null;
+  }
+},
   created() {
     this.fetchCryptoPrice();
   }
