@@ -13,8 +13,6 @@
         <li><router-link to="/dashboard/analysis">Analysis</router-link></li>
       </ul>
     </nav>
-
-    <!-- Renderiza el componente hijo -->
     <router-view />
   </div>
 
@@ -57,6 +55,8 @@ export default {
 .dashboard {
   text-align: center;
   padding: 20px;
+  max-width: 800px;
+  margin: auto;
 }
 
 nav ul {
@@ -88,5 +88,13 @@ nav ul li a:hover, button:hover {
   padding: 50px;
   font-size: 18px;
   font-weight: bold;
+}
+
+.totalHeader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+  color: aliceblue;
 }
 </style>

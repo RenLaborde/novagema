@@ -1,188 +1,218 @@
 <template>
-  <div class="analysis">
-    <h2 class="section-title">Current Financial Status</h2>
+  <div class="analysis-container">
+    <div class="header">
+      <button class="btn-back" @click="goDashboard">&larr; Back to Dashboard</button>
+      <h2>Analysis</h2>
+      <p>Analyze your crypto portfolio performance.</p>
+    </div>
 
-    <table class="analysis-table">
-      <thead>
-        <tr>
-          <th>Cryptocurrency</th>
-          <th>Amount</th>
-          <th>Value (ARS)</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(crypto, code) in cryptoData" :key="code">
-          <td>{{ code }}</td>
-          <td>{{ Number(crypto.amount).toFixed(4) }}</td>
-          <td>{{ formatCurrency(crypto.totalValue) }}</td>
-        </tr>
-        <tr>
-          <td><strong>Total</strong></td>
-          <td></td>
-          <td><strong>{{ formatCurrency(totalMoney) }}</strong></td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-section">
+      <table class="styled-table">
+        <thead>
+          <tr>
+            <th>Crypto</th>
+            <th>Amount</th>
+            <th>Current value (ARS)</th>
+            <th>Total invested (ARS)</th>
+            <th>Result</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(entry, code) in cryptoData" :key="code">
+            <td>{{ code.toUpperCase() }}</td>
+            <td>{{ entry.amount.toFixed(4) }}</td>
+            <td>{{ formatCurrency(entry.totalValue) }}</td>
+            <td>{{ formatCurrency(entry.totalSpent) }}</td>
+            <td :class="getResultClass(entry.totalValue, entry.totalSpent)">
+              {{ formatCurrency(entry.totalValue - entry.totalSpent) }}
+            </td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr class="total-row">
+            <td colspan="2">Total</td>
+            <td>{{ formatCurrency(totalValue) }}</td>
+            <td colspan="2"></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
 
-    <h2 class="section-title dark">Investment Performance</h2>
-    <table class="analysis-table">
-      <thead>
-        <tr>
-          <th>Cryptocurrency</th>
-          <th>Result</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(result, code) in investmentResults" :key="code">
-          <td>{{ code }}</td>
-          <td :class="Number(result) >= 0 ? 'positive' : 'negative'">
-            {{ Number(result) >= 0 ? '+' : '-' }} {{ formatCurrency(Math.abs(result)) }}
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="chart-container">
+      <Pie :data="chartData" />
+    </div>
   </div>
 </template>
 
-<script>
-import axios from "axios";
-import { useRouter } from "vue-router";
+<script setup>
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useUserStore } from '@/store/user'
+import { getUserTransactions, getCryptoPrices } from '@/services/apiClient'
+import { Pie } from 'vue-chartjs'
+import {
+  Chart as ChartJS,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement,
+} from 'chart.js'
 
-export default {
-  data() {
-    return {
-      transactions: [],
-      cryptoData: {},
-      totalMoney: 0,
-      investmentResults: {},
-      apiKey: "60eb09146661365596af552f",
-    };
-  },
+ChartJS.register(Title, Tooltip, Legend, ArcElement)
 
-  setup() {
-    const router = useRouter();
-    const goBack = () => router.push("/dashboard/");
-    return { goBack };
-  },
+const router = useRouter()
+const goDashboard = () => router.push('/dashboard')
 
-  methods: {
-    formatCurrency(value) {
-      if (isNaN(value)) return "$ 0.00";
-      return `$ ${Number(value).toFixed(2)}`;
-    },
+const userStore = useUserStore()
+const userId = userStore.userId
+const transactions = ref([])
+const cryptoData = ref({})
+const totalValue = ref(0)
+const chartData = ref({ labels: [], datasets: [] })
 
-    async fetchCryptoPrice(code) {
-      try {
-        const response = await axios.get(`https://criptoya.com/api/satoshitango/${code.toLowerCase()}/ars`);
-        return Number(response.data.totalBid || 0);
-      } catch (err) {
-        console.error(`Error fetching price for ${code}:`, err.message);
-        return 0;
+const formatCurrency = (value) => {
+  const n = Number(value)
+  if (isNaN(n)) return '$ 0,00'
+  return new Intl.NumberFormat('es-AR', {
+    style: 'currency',
+    currency: 'ARS'
+  }).format(n)
+}
+
+const getResultClass = (value, spent) => {
+  return value - spent >= 0 ? 'positive' : 'negative'
+}
+
+const fetchTransactions = async () => {
+  if (!userId) return
+  try {
+    transactions.value = await getUserTransactions(userId)
+    await processData()
+  } catch (error) {
+    console.error('Error fetching transactions:', error)
+  }
+}
+
+const processData = async () => {
+  cryptoData.value = {}
+  totalValue.value = 0
+
+  const uniqueCodes = [...new Set(transactions.value.map(t => t.crypto_code))]
+  const prices = {}
+
+  await Promise.all(uniqueCodes.map(async (code) => {
+    try {
+      prices[code] = await getCryptoPrices(code)
+    } catch (err) {
+      prices[code] = 0
+      console.error(`Error getting price for ${code}:`, err)
+    }
+  }))
+
+  for (const t of transactions.value) {
+    const code = t.crypto_code
+    const amount = parseFloat(t.crypto_amount)
+    const money = parseFloat(t.money)
+    if (!cryptoData.value[code]) {
+      cryptoData.value[code] = { amount: 0, totalSpent: 0, totalValue: 0 }
+    }
+
+    if (t.action === 'purchase') {
+      cryptoData.value[code].amount += amount
+      cryptoData.value[code].totalSpent += money
+    } else if (t.action === 'sale') {
+      cryptoData.value[code].amount -= amount
+      cryptoData.value[code].totalSpent -= money
+    }
+  }
+
+  const labels = []
+  const values = []
+
+  for (const code in cryptoData.value) {
+    const entry = cryptoData.value[code]
+    entry.totalValue = entry.amount * prices[code]
+    totalValue.value += entry.totalValue
+
+    labels.push(code.toUpperCase())
+    values.push(entry.totalValue)
+  }
+
+  chartData.value = {
+    labels,
+    datasets: [
+      {
+        label: 'Balance in (ARS)',
+        data: values,
+        backgroundColor: ['#007bff', '#28a745', '#ffc107', '#dc3545'],
+        borderWidth: 1
       }
-    },
+    ]
+  }
+}
 
-    async fetchTransactions() {
-      try {
-        const user_id = localStorage.getItem("user_id");
-        if (!user_id) throw new Error("user_id not found in localStorage");
-
-        const response = await axios.get(
-          `https://laboratorio3-f36a.restdb.io/rest/transactions?q={"user_id": "${user_id}"}`,
-          {
-            headers: {
-              "x-apikey": this.apiKey,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
-        this.transactions = response.data;
-        await this.processData();
-      } catch (error) {
-        console.error("Error fetching transactions:", error.message);
-      }
-    },
-
-    async processData() {
-      const cryptos = ["BTC", "ETH", "USDT", "DAI", "SOL"];
-      const prices = {};
-
-      for (const code of cryptos) {
-        prices[code] = await this.fetchCryptoPrice(code);
-      }
-
-      const data = {};
-      const investments = {};
-      let totalMoney = 0;
-
-      this.transactions.forEach((tx) => {
-        const code = tx.crypto_code;
-        const amount = parseFloat(tx.crypto_amount) || 0;
-        const money = parseFloat(tx.money) || 0;
-
-        if (!data[code]) {
-          data[code] = { amount: 0, invested: 0, totalValue: 0 };
-        }
-
-        if (tx.action === "purchase") {
-          data[code].amount += amount;
-          data[code].invested += money;
-        } else if (tx.action === "sale") {
-          data[code].amount -= amount;
-          data[code].invested -= money;
-        }
-      });
-
-      for (const code in data) {
-        const currentValue = data[code].amount * (prices[code] || 0);
-        data[code].totalValue = Number(currentValue.toFixed(2));
-        totalMoney += currentValue;
-
-        const profit = currentValue - data[code].invested;
-        investments[code] = Number(profit.toFixed(2));
-      }
-
-      this.cryptoData = data;
-      this.totalMoney = Number(totalMoney.toFixed(2));
-      this.investmentResults = investments;
-    },
-  },
-
-  mounted() {
-    this.fetchTransactions();
-  },
-};
+onMounted(fetchTransactions)
 </script>
 
 <style scoped>
-.analysis-table {
+.analysis-container {
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.btn-back {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  color: #007bff;
+}
+.table-section {
+  margin-bottom: 30px;
+  overflow-x: auto;
+}
+.styled-table {
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 2rem;
+  font-family: Arial, sans-serif;
 }
-
-.analysis-table th,
-.analysis-table td {
-  padding: 10px;
+.styled-table th,
+.styled-table td {
   border: 1px solid #ddd;
+  padding: 12px;
   text-align: center;
 }
-
-.section-title {
-  text-align: center;
-  color: #333;
-  margin: 2rem 0 1rem;
+.styled-table thead {
+  background-color: #007bff;
+  color: white;
 }
-
-.section-title.dark {
-  color: #000;
+.total-row td {
+  font-weight: bold;
+  background-color: #f4f4f4;
 }
-
 .positive {
   color: green;
 }
-
 .negative {
   color: red;
+}
+.chart-container {
+  max-width: 500px;
+  margin: 40px auto;
+  background-color: #ccc;
+}
+@media (max-width: 500px) {
+  .styled-table th,
+  .styled-table td {
+    padding: 8px;
+    font-size: 0.9rem;
+  }
 }
 </style>
