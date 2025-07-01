@@ -1,15 +1,16 @@
 <template>
   <div class="dashboard" v-if="userId">
     <Logo />
+
     <h2>Welcome</h2>
-    <p>Your user ID: {{ userId }}</p>
-    
+    <p>Your User ID: {{ userId }}</p>
+
     <nav>
       <ul>
         <li><button @click="goToLogin">Back to Login</button></li>
         <li><router-link to="/dashboard/transactions">Transactions</router-link></li>
         <li><router-link to="/dashboard/marketprices">Market Prices</router-link></li>
-        <li><router-link to="/dashboard/history">History</router-link></li> 
+        <li><router-link to="/dashboard/history">History</router-link></li>
         <li><router-link to="/dashboard/analysis">Analysis</router-link></li>
       </ul>
     </nav>
@@ -21,33 +22,25 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { useUserStore } from '@/store/user';
 import { useRouter } from 'vue-router';
 import { computed, onMounted } from 'vue';
-import Logo from '@/components/Logo.vue'; 
+import Logo from '@/components/Logo.vue';
 
-export default {
-  components: { Logo },
+const userStore = useUserStore();
+const userId = computed(() => userStore.userId);
+const router = useRouter();
 
-  setup() {
-    const userStore = useUserStore();
-    const userId = computed(() => userStore.userId);
-    const router = useRouter();
+onMounted(() => {
+  if (!userId.value) {
+    router.push('/');
+  }
+});
 
-    onMounted(() => {
-      if (!userStore.userId) {
-        router.push('/');
-      }
-    });
-
-    const goToLogin = () => {
-      userStore.logout();
-      router.push('/');
-    };
-
-    return { userId, goToLogin };
-  },
+const goToLogin = () => {
+  userStore.logout();
+  router.push('/');
 };
 </script>
 
@@ -64,13 +57,15 @@ nav ul {
   justify-content: center;
   padding: 0;
   gap: 15px;
+  flex-wrap: wrap;
 }
 
 nav ul li {
   list-style: none;
 }
 
-nav ul li a, button {
+nav ul li a,
+button {
   text-decoration: none;
   color: #007bff;
   font-weight: bold;
@@ -79,7 +74,8 @@ nav ul li a, button {
   cursor: pointer;
 }
 
-nav ul li a:hover, button:hover {
+nav ul li a:hover,
+button:hover {
   text-decoration: underline;
 }
 
@@ -88,13 +84,5 @@ nav ul li a:hover, button:hover {
   padding: 50px;
   font-size: 18px;
   font-weight: bold;
-}
-
-.totalHeader {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 20px;
-  color: aliceblue;
 }
 </style>

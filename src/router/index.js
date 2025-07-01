@@ -20,22 +20,22 @@ const routes = [
     meta: { requiresAuth: true },
     children: [
       {
-        path: 'transactions', 
+        path: 'transactions',
         name: 'Transactions',
         component: Transactions
       },
       {
-        path: 'history', 
+        path: 'history',
         name: 'History',
         component: History
       },
       {
-        path: 'marketprices', 
+        path: 'marketprices',
         name: 'MarketPrices',
         component: MarketPrices
       },
       {
-        path: 'analysis', 
+        path: 'analysis',
         name: 'Analysis',
         component: Analysis
       }
@@ -47,6 +47,7 @@ const router = createRouter({
   history: createWebHistory(),
   routes
 });
+
 
 router.beforeEach((to, from, next) => {
   const userStore = useUserStore();

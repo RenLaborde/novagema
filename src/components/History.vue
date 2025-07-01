@@ -88,7 +88,7 @@ import {
   getUserTransactions,
   deleteTransactionById,
   patchTransactionById,
-  getCryptoPrices
+  getCryptoPrice,
 } from '@/services/apiClient';
 import { useUserStore } from '@/store/user';
 
@@ -131,7 +131,7 @@ export default {
     async recalculateMoney() {
       if (!this.editData.crypto_code || !this.editData.crypto_amount) return;
       try {
-        const price = await getCryptoPrices(this.editData.crypto_code);
+        const price = await getCryptoPrice(this.editData.crypto_code);
         this.editData.money = parseFloat(
           (price * this.editData.crypto_amount).toFixed(2)
         );
@@ -214,7 +214,17 @@ export default {
   max-width: 1000px;
   margin: auto;
   padding: 20px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  border: 1px solid #007bff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: #f5f8f9;
+  font-family: Arial, sans-serif;
+  max-width: 800px;
+  text-align: center;
+}
+h2 {
+  color: #333;
+  margin-bottom: 10px;
 }
 .subtitle {
   color: #666;

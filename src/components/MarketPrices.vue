@@ -77,6 +77,13 @@ export default {
 
 <style scoped>
 .container {
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #007bff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: #f5f8f9;
+  font-family: Arial, sans-serif;
   max-width: 800px;
   margin: auto;
   text-align: center;

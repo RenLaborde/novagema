@@ -1,84 +1,50 @@
 <template>
-  <div class="container py-4">
-    <div class="card shadow-lg p-4">
-      <h2 class="text-primary mb-3 text-center">Crypto Transactions</h2>
-      <p class="text-muted text-center">Buy and sell cryptocurrencies with ease.</p>
+  <div class="transactions">
+     <h2>Track Transactions</h2>
+    <form @submit.prevent="confirmTransaction">
+      <label for="transactionType">Transaction Type:</label>
+      <select id="transactionType" v-model="action">
+        <option value="purchase">Buy</option>
+        <option value="sale">Sell</option>
+      </select>
 
-      <form @submit.prevent="confirmTransaction">
-        <div class="mb-3">
-          <label for="transactionType" class="form-label">Transaction Type:</label>
-          <select id="transactionType" v-model="action" class="form-select">
-            <option value="purchase">Buy</option>
-            <option value="sale">Sell</option>
-          </select>
-        </div>
+      <label for="cryptoType">Cryptocurrency:</label>
+      <select id="cryptoType" v-model="cryptoCode">
+        <option value="btc">Bitcoin</option>
+        <option value="usdc">USDC</option>
+        <option value="eth">Ethereum</option>
+      </select>
 
-        <div class="mb-3">
-          <label for="cryptoType" class="form-label">Cryptocurrency:</label>
-          <select id="cryptoType" v-model="cryptoCode" class="form-select">
-            <option value="btc">Bitcoin</option>
-            <option value="usdc">USDC</option>
-            <option value="eth">Ethereum</option>
-          </select>
-        </div>
+      <label for="cryptoAmount">Amount:</label>
+      <input type="number" id="cryptoAmount" v-model="cryptoAmount" step="0.0001" required>
 
-        <div class="mb-3">
-          <label for="cryptoAmount" class="form-label">Amount:</label>
-          <input
-            type="number"
-            id="cryptoAmount"
-            v-model="cryptoAmount"
-            step="0.0001"
-            class="form-control"
-            required
-          />
-        </div>
+      <div v-if="cryptoPrice !== null">
+        <p>Current Price of {{ cryptoCode.toUpperCase() }}: {{ cryptoPrice }} ARS</p>
+      </div>
 
-        <div v-if="cryptoPrice !== null" class="mb-3">
-          <p class="alert alert-info p-2">
-            Current price of {{ cryptoCode.toUpperCase() }}: <strong>{{ cryptoPrice }} ARS</strong>
-          </p>
-        </div>
+      <label for="money">{{ action === 'purchase' ? 'Amount to Pay (ARS):' : 'Amount to Receive (ARS):' }}</label>
+      <input type="number" id="money" :value="calculatedMoney" step="0.01" disabled>
 
-        <div class="mb-3">
-          <label for="money" class="form-label">
-            {{ action === 'purchase' ? 'Amount to Pay (ARS):' : 'Amount to Receive (ARS):' }}
-          </label>
-          <input
-            type="number"
-            id="money"
-            :value="calculatedMoney"
-            class="form-control"
-            disabled
-          />
-        </div>
+      <label for="datetime">Date and Time:</label>
+      <input type="datetime-local" id="datetime" v-model="datetime" required>
 
-        <div class="mb-3">
-          <label for="datetime" class="form-label">Date and Time:</label>
-          <input
-            type="datetime-local"
-            id="datetime"
-            v-model="datetime"
-            class="form-control"
-            required
-          />
-        </div>
-
-        <button
-          type="submit"
-          class="btn w-100"
-          :class="action === 'purchase' ? 'btn-success' : 'btn-danger'"
-        >
-          Confirm {{ action === 'purchase' ? 'Purchase' : 'Sale' }}
-        </button>
-      </form>
-    </div>
+      <button
+        type="submit"
+        :class="{
+          'buy-button': action === 'purchase',
+          'sell-button': action === 'sale'
+        }"
+      >
+        Confirm {{ action === 'purchase' ? 'Purchase' : 'Sale' }}
+      </button>
+    </form>
   </div>
 </template>
 
 <script>
-import { getCryptoPrices, createTransaction } from '@/services/apiClient';
+import { getCryptoPrice, createTransaction} from '@/services/apiClient';
 import { useUserStore } from '@/store/user';
+
 
 export default {
   data() {
@@ -102,7 +68,7 @@ export default {
   methods: {
     async fetchCryptoPrice() {
       try {
-        this.cryptoPrice = await getCryptoPrices(this.cryptoCode);
+        this.cryptoPrice = await getCryptoPrice(this.cryptoCode);
       } catch (error) {
         console.error("Error fetching crypto price:", error.message);
         this.cryptoPrice = null;
@@ -110,36 +76,36 @@ export default {
     },
 
     async confirmTransaction() {
-      const userStore = useUserStore();
-      const userId = userStore.userId;
+    const userStore = useUserStore();
+    const userId = userStore.userId;
 
-      const transactionData = {
-        user_id: userId,
-        action: this.action,
-        crypto_code: this.cryptoCode,
-        crypto_amount: parseFloat(this.cryptoAmount),
-        money: parseFloat(this.calculatedMoney),
-        datetime: this.datetime,
-      };
+    const transactionData = {
+      user_id: userId,
+      action: this.action,
+      crypto_code: this.cryptoCode,
+      crypto_amount: parseFloat(this.cryptoAmount),
+      money: parseFloat(this.calculatedMoney),
+      datetime: this.datetime,
+    };
 
-      try {
-        await createTransaction(transactionData);
-        alert('Transaction successfully confirmed!');
-        this.resetForm();
-      } catch (err) {
-        alert('Error submitting transaction');
-        console.error(err);
-      }
-    },
-
-    resetForm() {
-      this.cryptoCode = 'btc';
-      this.cryptoAmount = '';
-      this.datetime = '';
-      this.action = 'purchase';
-      this.cryptoPrice = null;
+    try {
+      await createTransaction(transactionData);
+      alert('Transaction successfully confirmed!');
+      this.resetForm(); // sugerido
+    } catch (err) {
+      alert('Error submitting transaction');
+      console.error(err);
     }
   },
+
+  resetForm() {
+    this.cryptoCode = 'btc';
+    this.cryptoAmount = '';
+    this.datetime = '';
+    this.action = 'purchase';
+    this.cryptoPrice = null;
+  }
+},
   created() {
     this.fetchCryptoPrice();
   }
@@ -148,7 +114,7 @@ export default {
 
 <style scoped>
 .transactions {
-  max-width: 400px;
+  max-width: 1000px;
   margin: auto;
   padding: 20px;
   border: 1px solid #007bff;
@@ -156,13 +122,14 @@ export default {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   background: #f5f8f9;
   font-family: Arial, sans-serif;
+  max-width: 800px;
+  text-align: center;
 }
 
 label {
   font-weight: bold;
   display: block;
   margin-top: 10px;
-  
 }
 
 input, select {

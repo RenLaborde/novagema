@@ -48,7 +48,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/store/user'
-import { getUserTransactions, getCryptoPrices } from '@/services/apiClient'
+import { getUserTransactions, getCryptoPrice } from '@/services/apiClient'
 import { Pie } from 'vue-chartjs'
 import {
   Chart as ChartJS,
@@ -102,7 +102,7 @@ const processData = async () => {
 
   await Promise.all(uniqueCodes.map(async (code) => {
     try {
-      prices[code] = await getCryptoPrices(code)
+      prices[code] = await getCryptoPrice(code)
     } catch (err) {
       prices[code] = 0
       console.error(`Error getting price for ${code}:`, err)
@@ -156,9 +156,18 @@ onMounted(fetchTransactions)
 
 <style scoped>
 .analysis-container {
-  max-width: 900px;
   margin: auto;
   padding: 20px;
+  max-width: 1000px;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #007bff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: #f5f8f9;
+  font-family: Arial, sans-serif;
+  max-width: 800px;
+  text-align: center;
 }
 
 .header {

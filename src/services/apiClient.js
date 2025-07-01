@@ -1,9 +1,9 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-  baseURL: 'https://labor3-d60e.restdb.io/rest/',
+  baseURL: 'https://laboratorio3-f36a.restdb.io/rest',
   headers: {
-    'x-apikey': '64a2e9bc86d8c525a3ed8f63',
+    'x-apikey': '60eb09146661365596af552f',
     'Content-Type': 'application/json',
   },
 });
@@ -66,7 +66,7 @@ export const deleteTransactionById = async (id) => {
   }
 };
 
-export const getCryptoPrices = async (cryptoCode) => {
+export const getCryptoPrice = async (cryptoCode) => {
   if (!cryptoCode) throw new Error('Invalid cryptocurrency code.');
 
   try {
