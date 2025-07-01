@@ -1,5 +1,6 @@
 <template>
   <div class="transactions">
+     <h2>Track Transactions</h2>
     <form @submit.prevent="confirmTransaction">
       <label for="transactionType">Transaction Type:</label>
       <select id="transactionType" v-model="action">
@@ -41,7 +42,7 @@
 </template>
 
 <script>
-import { getCryptoPrices, createTransaction} from '@/services/apiClient';
+import { getCryptoPrice, createTransaction} from '@/services/apiClient';
 import { useUserStore } from '@/store/user';
 
 
@@ -67,7 +68,7 @@ export default {
   methods: {
     async fetchCryptoPrice() {
       try {
-        this.cryptoPrice = await getCryptoPrices(this.cryptoCode);
+        this.cryptoPrice = await getCryptoPrice(this.cryptoCode);
       } catch (error) {
         console.error("Error fetching crypto price:", error.message);
         this.cryptoPrice = null;
@@ -113,13 +114,16 @@ export default {
 
 <style scoped>
 .transactions {
-  max-width: 400px;
+  max-width: 1000px;
   margin: auto;
   padding: 20px;
-  border: 1px solid #ccc;
+  border: 1px solid #007bff;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  background: #fff;
+  background: #f5f8f9;
+  font-family: Arial, sans-serif;
+  max-width: 800px;
+  text-align: center;
 }
 
 label {

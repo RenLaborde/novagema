@@ -66,7 +66,7 @@ export const deleteTransactionById = async (id) => {
   }
 };
 
-export const getCryptoPrices = async (cryptoCode) => {
+export const getCryptoPrice = async (cryptoCode) => {
   if (!cryptoCode) throw new Error('Invalid cryptocurrency code.');
 
   try {

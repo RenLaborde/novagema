@@ -1,12 +1,13 @@
 <template>
   <div class="history">
     <h2>Transaction History</h2>
+    <p class="subtitle">Manage, view, and edit your crypto transactions with ease.</p>
 
-    <div v-if="paginatedTransactions.length">
+    <div v-if="paginatedTransactions.length" class="transaction-list">
       <div
         v-for="transaction in paginatedTransactions"
         :key="transaction._id"
-        class="transaction-item"
+        class="transaction-card"
       >
         <template v-if="editMode && editData._id === transaction._id">
           <h3>Edit Transaction</h3>
@@ -40,12 +41,7 @@
 
             <label>
               ARS:
-              <input
-                v-model.number="editData.money"
-                type="number"
-                step="any"
-                readonly
-              />
+              <input v-model.number="editData.money" type="number" step="any" readonly />
             </label>
 
             <label>
@@ -54,37 +50,35 @@
             </label>
 
             <div class="buttons">
-              <button @click="saveEdit">Save</button>
-              <button class="cancel" @click="cancelEdit">Cancel</button>
+              <button @click="saveEdit">💾 Save</button>
+              <button class="cancel" @click="cancelEdit">✖ Cancel</button>
             </div>
           </div>
         </template>
 
-        <!-- Vista Normal -->
         <template v-else>
           <p><strong>Type:</strong> {{ transaction.action === 'purchase' ? 'Buy' : 'Sell' }}</p>
           <p><strong>Crypto:</strong> {{ transaction.crypto_code?.toUpperCase() }}</p>
           <p><strong>Amount:</strong> {{ transaction.crypto_amount }}</p>
-          <p><strong>ARS:</strong> {{ transaction.money }}</p>
+          <p><strong>ARS:</strong> ${{ transaction.money }}</p>
           <p><strong>Date:</strong> {{ formatDate(transaction.datetime) }}</p>
 
           <div class="buttons">
-            <button @click="editTransaction(transaction)">Edit</button>
-            <button class="delete" @click="deleteTransaction(transaction._id)">Delete</button>
+            <button @click="editTransaction(transaction)">✏ Edit</button>
+            <button class="delete" @click="deleteTransaction(transaction._id)">🗑 Delete</button>
           </div>
         </template>
       </div>
 
-      <!-- Paginación -->
       <div class="pagination">
-        <button @click="prevPage" :disabled="currentPage === 1">Prev</button>
+        <button @click="prevPage" :disabled="currentPage === 1">← Prev</button>
         <span>Page {{ currentPage }} of {{ totalPages }}</span>
-        <button @click="nextPage" :disabled="currentPage >= totalPages">Next</button>
+        <button @click="nextPage" :disabled="currentPage >= totalPages">Next →</button>
       </div>
     </div>
 
-    <div v-else>
-      <p>No transactions found.</p>
+    <div v-else class="empty-state">
+      <p>No transactions found...</p>
     </div>
   </div>
 </template>
@@ -94,14 +88,14 @@ import {
   getUserTransactions,
   deleteTransactionById,
   patchTransactionById,
-  getCryptoPrices 
+  getCryptoPrice,
 } from '@/services/apiClient';
 import { useUserStore } from '@/store/user';
 
 export default {
   data() {
     return {
-      user_Id: null,
+      userId: null,
       transactions: [],
       currentPage: 1,
       transactionsPerPage: 5,
@@ -110,8 +104,8 @@ export default {
       availableCryptos: [
         { code: 'btc', name: 'Bitcoin' },
         { code: 'eth', name: 'Ethereum' },
-        { code: 'usdc', name: 'USDC' },
-      ],
+        { code: 'usdc', name: 'USDC' }
+      ]
     };
   },
   computed: {
@@ -121,7 +115,7 @@ export default {
     },
     totalPages() {
       return Math.ceil(this.transactions.length / this.transactionsPerPage);
-    },
+    }
   },
   methods: {
     async fetchTransactions() {
@@ -137,7 +131,7 @@ export default {
     async recalculateMoney() {
       if (!this.editData.crypto_code || !this.editData.crypto_amount) return;
       try {
-        const price = await getCryptoPrices(this.editData.crypto_code);
+        const price = await getCryptoPrice(this.editData.crypto_code);
         this.editData.money = parseFloat(
           (price * this.editData.crypto_amount).toFixed(2)
         );
@@ -153,18 +147,18 @@ export default {
     },
     formatDate(dateStr) {
       const date = new Date(dateStr);
-      return date.toLocaleString('en-US', {
+      return date.toLocaleString('en-GB', {
         year: 'numeric',
         month: 'short',
         day: '2-digit',
         hour: '2-digit',
-        minute: '2-digit',
+        minute: '2-digit'
       });
     },
     editTransaction(transaction) {
       this.editData = {
         ...transaction,
-        datetime: new Date(transaction.datetime).toISOString().slice(0, 16),
+        datetime: new Date(transaction.datetime).toISOString().slice(0, 16)
       };
       this.editMode = true;
     },
@@ -186,7 +180,7 @@ export default {
           crypto_amount: parseFloat(crypto_amount),
           money: parseFloat(money),
           datetime: new Date(datetime).toISOString(),
-          user_id: this.userId,
+          user_id: this.userId
         };
 
         await patchTransactionById(_id, updated);
@@ -205,45 +199,112 @@ export default {
         console.error('Error deleting transaction:', error.message);
         alert('An error occurred while deleting the transaction.');
       }
-    },
+    }
   },
   async mounted() {
     const store = useUserStore();
     this.userId = store.userId;
     await this.fetchTransactions();
-  },
+  }
 };
 </script>
 
 <style scoped>
 .history {
-  max-width: 600px;
-  margin: 0 auto;
+  max-width: 1000px;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #007bff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: #f5f8f9;
   font-family: Arial, sans-serif;
+  max-width: 800px;
+  text-align: center;
 }
-.transaction-item {
-  border: 1px solid #ccc;
-  padding: 15px;
+h2 {
+  color: #333;
   margin-bottom: 10px;
-  border-radius: 6px;
+}
+.subtitle {
+  color: #666;
+  margin-bottom: 20px;
+}
+.transaction-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+.transaction-card {
+  background: #f9fafa;
+  border-left: 5px solid #007bff;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.06);
+}
+.edit-form label {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+}
+input,
+select {
+  padding: 8px;
+  margin-top: 4px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+  width: 100%;
 }
 .buttons {
   margin-top: 10px;
 }
 button {
+  padding: 8px 12px;
+  background-color: #007bff;
+  color: white;
+  border: none;
   margin-right: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+button:hover {
+  background-color: #0056b3;
+}
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
 }
 .cancel {
-  background-color: #ccc;
+  background-color: #6c757d;
 }
 .delete {
-  color: white;
-  background-color: red;
+  background-color: #dc3545;
+}
+.delete:hover {
+  background-color: #b52b37;
 }
 .pagination {
   display: flex;
   justify-content: center;
   align-items: center;
   margin-top: 20px;
+  gap: 15px;
+}
+.empty-state {
+  text-align: center;
+  padding: 20px;
+  color: #999;
+}
+
+@media (max-width: 600px) {
+  .transaction-card {
+    padding: 12px;
+  }
+  .pagination {
+    flex-direction: column;
+    gap: 5px;
+  }
 }
 </style>

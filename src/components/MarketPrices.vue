@@ -1,6 +1,8 @@
 <template>
   <div class="container">
-    <h2>Real-Time Crypto Prices at Your Fingertips!</h2>
+    <h2>Market Prices</h2>
+    <h4>Real-Time Crypto Prices at Your Fingertips.</h4>
+    <p>Check the latest Bitcoin prices across different exchanges in Argentina.</p>
     <input v-model="searchQuery" placeholder="Search exchange..." class="search-input" />
     <table>
       <thead>
@@ -75,6 +77,13 @@ export default {
 
 <style scoped>
 .container {
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #007bff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: #f5f8f9;
+  font-family: Arial, sans-serif;
   max-width: 800px;
   margin: auto;
   text-align: center;
@@ -97,7 +106,7 @@ th, td {
   text-align: center;
 }
 th {
-  background-color: #333;
+  background-color: #007bff;
   color: white;
 }
 .buy-price {
