@@ -32,33 +32,46 @@
           <tr class="total-row">
             <td colspan="2">Total</td>
             <td>{{ formatCurrency(totalValue) }}</td>
-            <td colspan="2"></td>
+            <td>{{ formatCurrency(totalSpentTotal) }}</td>
+            <td :class="getResultClass(totalValue, totalSpentTotal)">
+              {{ formatCurrency(totalValue - totalSpentTotal) }}
+            </td>
           </tr>
         </tfoot>
       </table>
     </div>
 
-    <div class="chart-container">
+    <div class="chart-section">
+      <h3>Current Distribution</h3>
       <Pie :data="chartData" />
+
+      <h3>Investment vs Value (Bar)</h3>
+      <Bar :data="barChartData" />
+
+      <h3>Profit/Loss per Crypto</h3>
+      <Doughnut :data="doughnutData" />
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/store/user'
 import { getUserTransactions, getCryptoPrice } from '@/services/apiClient'
-import { Pie } from 'vue-chartjs'
+import { Pie, Bar, Doughnut } from 'vue-chartjs'
 import {
   Chart as ChartJS,
   Title,
   Tooltip,
   Legend,
   ArcElement,
+  BarElement,
+  CategoryScale,
+  LinearScale,
 } from 'chart.js'
 
-ChartJS.register(Title, Tooltip, Legend, ArcElement)
+ChartJS.register(Title, Tooltip, Legend, ArcElement, BarElement, CategoryScale, LinearScale)
 
 const router = useRouter()
 const goDashboard = () => router.push('/dashboard')
@@ -68,7 +81,10 @@ const userId = userStore.userId
 const transactions = ref([])
 const cryptoData = ref({})
 const totalValue = ref(0)
+
 const chartData = ref({ labels: [], datasets: [] })
+const barChartData = ref({ labels: [], datasets: [] })
+const doughnutData = ref({ labels: [], datasets: [] })
 
 const formatCurrency = (value) => {
   const n = Number(value)
@@ -82,6 +98,10 @@ const formatCurrency = (value) => {
 const getResultClass = (value, spent) => {
   return value - spent >= 0 ? 'positive' : 'negative'
 }
+
+const totalSpentTotal = computed(() => {
+  return Object.values(cryptoData.value).reduce((sum, entry) => sum + entry.totalSpent, 0)
+})
 
 const fetchTransactions = async () => {
   if (!userId) return
@@ -128,6 +148,8 @@ const processData = async () => {
 
   const labels = []
   const values = []
+  const invested = []
+  const profits = []
 
   for (const code in cryptoData.value) {
     const entry = cryptoData.value[code]
@@ -136,18 +158,43 @@ const processData = async () => {
 
     labels.push(code.toUpperCase())
     values.push(entry.totalValue)
+    invested.push(entry.totalSpent)
+    profits.push(entry.totalValue - entry.totalSpent)
   }
 
   chartData.value = {
     labels,
+    datasets: [{
+      label: 'Balance (ARS)',
+      data: values,
+      backgroundColor: ['#007bff', '#28a745', '#ffc107', '#dc3545'],
+      borderWidth: 1
+    }]
+  }
+
+  barChartData.value = {
+    labels,
     datasets: [
       {
-        label: 'Balance in (ARS)',
+        label: 'Invested',
+        data: invested,
+        backgroundColor: '#ffc107'
+      },
+      {
+        label: 'Current Value',
         data: values,
-        backgroundColor: ['#007bff', '#28a745', '#ffc107', '#dc3545'],
-        borderWidth: 1
+        backgroundColor: '#007bff'
       }
     ]
+  }
+
+  doughnutData.value = {
+    labels,
+    datasets: [{
+      label: 'Profit/Loss',
+      data: profits,
+      backgroundColor: profits.map(p => p >= 0 ? '#28a745' : '#dc3545')
+    }]
   }
 }
 
@@ -159,14 +206,11 @@ onMounted(fetchTransactions)
   margin: auto;
   padding: 20px;
   max-width: 1000px;
-  margin: auto;
-  padding: 20px;
   border: 1px solid #007bff;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   background: #f5f8f9;
   font-family: Arial, sans-serif;
-  max-width: 800px;
   text-align: center;
 }
 
@@ -212,16 +256,21 @@ onMounted(fetchTransactions)
 .negative {
   color: red;
 }
-.chart-container {
-  max-width: 500px;
+.chart-section {
+  max-width: 800px;
   margin: 40px auto;
-  background-color: #ccc;
+  display: grid;
+  gap: 30px;
+  grid-template-columns: 1fr;
 }
 @media (max-width: 500px) {
   .styled-table th,
   .styled-table td {
     padding: 8px;
     font-size: 0.9rem;
+  }
+  .chart-section {
+    grid-template-columns: 1fr;
   }
 }
 </style>
