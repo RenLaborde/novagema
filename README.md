@@ -1,23 +1,25 @@
-# novagema
+# NovaGema 💎
 
-git pull origin main
+Final project for Laboratorio III - Tecnicatura Universitaria en Programación.
 
------------
+## Description
+NovaGema is a cryptocurrency portfolio dashboard. It allows users to:
 
-git status  
-git add .    
-git commit -m "Change description"  
-git push origin main 
+- Track transactions (buy/sell)
+- View market prices in real-time
+- Analyze portfolio performance
+- See data visualizations (charts)
+- Filter best exchanges to buy/sell
 
--------
+## Technologies
+- Vue 3 + Vite
+- Pinia
+- Chart.js
+- CriptoYa API
+- GitHub for version control
 
-git checkout dev
+## Live Preview
+_Optional: if deployed somewhere_
 
-git checkout -b feature/new-function  
-git push origin feature/new-function  
-git checkout dev
-git merge feature/new-function 
-git push origin dev
-
-
-watch effect 
+## Author
+Renata Laborde
