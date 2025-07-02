@@ -18,8 +18,5 @@ NovaGema is a cryptocurrency portfolio dashboard. It allows users to:
 - CriptoYa API
 - GitHub for version control
 
-## Live Preview
-_Optional: if deployed somewhere_
-
 ## Author
 Renata Laborde
