@@ -32,20 +32,15 @@
           <tr class="total-row">
             <td colspan="2">Total</td>
             <td>{{ formatCurrency(totalValue) }}</td>
-<<<<<<< HEAD
             <td>{{ formatCurrency(totalSpentTotal) }}</td>
             <td :class="getResultClass(totalValue, totalSpentTotal)">
               {{ formatCurrency(totalValue - totalSpentTotal) }}
             </td>
-=======
-            <td colspan="2"></td>
->>>>>>> dev
           </tr>
         </tfoot>
       </table>
     </div>
 
-<<<<<<< HEAD
     <div class="chart-section">
       <h3>Current Distribution</h3>
       <Pie :data="chartData" />
@@ -55,46 +50,29 @@
 
       <h3>Profit/Loss per Crypto</h3>
       <Doughnut :data="doughnutData" />
-=======
-    <div class="chart-container">
-      <Pie :data="chartData" />
->>>>>>> dev
     </div>
   </div>
 </template>
 
 <script setup>
-<<<<<<< HEAD
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/store/user'
 import { getUserTransactions, getCryptoPrice } from '@/services/apiClient'
 import { Pie, Bar, Doughnut } from 'vue-chartjs'
-=======
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { useUserStore } from '@/store/user'
-import { getUserTransactions, getCryptoPrice } from '@/services/apiClient'
-import { Pie } from 'vue-chartjs'
->>>>>>> dev
+
 import {
   Chart as ChartJS,
   Title,
   Tooltip,
   Legend,
   ArcElement,
-<<<<<<< HEAD
   BarElement,
   CategoryScale,
-  LinearScale,
+  LinearScale
 } from 'chart.js'
 
 ChartJS.register(Title, Tooltip, Legend, ArcElement, BarElement, CategoryScale, LinearScale)
-=======
-} from 'chart.js'
-
-ChartJS.register(Title, Tooltip, Legend, ArcElement)
->>>>>>> dev
 
 const router = useRouter()
 const goDashboard = () => router.push('/dashboard')
@@ -104,16 +82,11 @@ const userId = userStore.userId
 const transactions = ref([])
 const cryptoData = ref({})
 const totalValue = ref(0)
-<<<<<<< HEAD
 
 const chartData = ref({ labels: [], datasets: [] })
 const barChartData = ref({ labels: [], datasets: [] })
 const doughnutData = ref({ labels: [], datasets: [] })
 
-=======
-const chartData = ref({ labels: [], datasets: [] })
-
->>>>>>> dev
 const formatCurrency = (value) => {
   const n = Number(value)
   if (isNaN(n)) return '$ 0,00'
@@ -127,13 +100,10 @@ const getResultClass = (value, spent) => {
   return value - spent >= 0 ? 'positive' : 'negative'
 }
 
-<<<<<<< HEAD
 const totalSpentTotal = computed(() => {
   return Object.values(cryptoData.value).reduce((sum, entry) => sum + entry.totalSpent, 0)
 })
 
-=======
->>>>>>> dev
 const fetchTransactions = async () => {
   if (!userId) return
   try {
@@ -179,11 +149,8 @@ const processData = async () => {
 
   const labels = []
   const values = []
-<<<<<<< HEAD
   const invested = []
   const profits = []
-=======
->>>>>>> dev
 
   for (const code in cryptoData.value) {
     const entry = cryptoData.value[code]
@@ -192,16 +159,12 @@ const processData = async () => {
 
     labels.push(code.toUpperCase())
     values.push(entry.totalValue)
-<<<<<<< HEAD
     invested.push(entry.totalSpent)
     profits.push(entry.totalValue - entry.totalSpent)
-=======
->>>>>>> dev
   }
 
   chartData.value = {
     labels,
-<<<<<<< HEAD
     datasets: [{
       label: 'Balance (ARS)',
       data: values,
@@ -236,19 +199,6 @@ const processData = async () => {
   }
 }
 
-=======
-    datasets: [
-      {
-        label: 'Balance in (ARS)',
-        data: values,
-        backgroundColor: ['#007bff', '#28a745', '#ffc107', '#dc3545'],
-        borderWidth: 1
-      }
-    ]
-  }
-}
-
->>>>>>> dev
 onMounted(fetchTransactions)
 </script>
 
@@ -257,20 +207,11 @@ onMounted(fetchTransactions)
   margin: auto;
   padding: 20px;
   max-width: 1000px;
-<<<<<<< HEAD
-=======
-  margin: auto;
-  padding: 20px;
->>>>>>> dev
   border: 1px solid #007bff;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   background: #f5f8f9;
   font-family: Arial, sans-serif;
-<<<<<<< HEAD
-=======
-  max-width: 800px;
->>>>>>> dev
   text-align: center;
 }
 
@@ -316,19 +257,12 @@ onMounted(fetchTransactions)
 .negative {
   color: red;
 }
-<<<<<<< HEAD
 .chart-section {
   max-width: 800px;
   margin: 40px auto;
   display: grid;
   gap: 30px;
   grid-template-columns: 1fr;
-=======
-.chart-container {
-  max-width: 500px;
-  margin: 40px auto;
-  background-color: #ccc;
->>>>>>> dev
 }
 @media (max-width: 500px) {
   .styled-table th,
@@ -336,13 +270,8 @@ onMounted(fetchTransactions)
     padding: 8px;
     font-size: 0.9rem;
   }
-<<<<<<< HEAD
   .chart-section {
     grid-template-columns: 1fr;
   }
 }
 </style>
-=======
-}
-</style>
->>>>>>> dev

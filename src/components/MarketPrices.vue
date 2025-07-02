@@ -2,7 +2,6 @@
   <div class="container">
     <h2>Market Prices</h2>
     <h4>Real-Time Crypto Prices at Your Fingertips.</h4>
-<<<<<<< HEAD
     <p>Select a cryptocurrency and operation to see where it’s best to trade.</p>
 
     <div class="filters">
@@ -35,10 +34,6 @@
       <strong>{{ formatCurrencyARS(bestExchange.price) }}</strong>
     </p>
 
-=======
-    <p>Check the latest Bitcoin prices across different exchanges in Argentina.</p>
-    <input v-model="searchQuery" placeholder="Search exchange..." class="search-input" />
->>>>>>> dev
     <table>
       <thead>
         <tr>
@@ -63,81 +58,81 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 
 export default {
   setup() {
-    const prices = ref({})
-    const selectedCrypto = ref('btc')
-    const operation = ref('buy')
-    const searchQuery = ref('')
-    const error = ref(null)
-    const bestExchange = ref(null)
-    let intervalId = null
+    const prices = ref({});
+    const selectedCrypto = ref('btc');
+    const operation = ref('buy');
+    const searchQuery = ref('');
+    const error = ref(null);
+    const bestExchange = ref(null);
+    let intervalId = null;
 
     const fetchCryptoPrices = async () => {
       try {
-        const response = await fetch(`https://criptoya.com/api/${selectedCrypto.value}/ars`)
-        const data = await response.json()
-        prices.value = data
-        error.value = null
-        findBestExchange()
+        const response = await fetch(`https://criptoya.com/api/${selectedCrypto.value}/ars`);
+        const data = await response.json();
+        prices.value = data;
+        error.value = null;
+        findBestExchange();
       } catch (err) {
-        error.value = 'Error fetching crypto prices.'
-        console.error('Error fetching crypto prices:', err)
+        error.value = 'Error fetching crypto prices.';
+        console.error('Error fetching crypto prices:', err);
       }
-    }
+    };
 
     const findBestExchange = () => {
-      let best = null
+      let best = null;
 
       for (const [exchange, data] of Object.entries(prices.value)) {
-        const value = operation.value === 'buy' ? data.ask : data.bid
-        if (!value) continue
+        const value = operation.value === 'buy' ? data.ask : data.bid;
+        if (!value) continue;
         if (
           !best ||
           (operation.value === 'buy' && value < best.price) ||
           (operation.value === 'sell' && value > best.price)
         ) {
-          best = { name: exchange, price: value }
+          best = { name: exchange, price: value };
         }
       }
 
-      bestExchange.value = best
-    }
+      bestExchange.value = best;
+    };
 
     const filteredPrices = computed(() => {
-      if (!searchQuery.value) return prices.value
+      if (!searchQuery.value) return prices.value;
       return Object.fromEntries(
         Object.entries(prices.value).filter(([exchange]) =>
           exchange.toLowerCase().includes(searchQuery.value.toLowerCase())
         )
-      )
-    })
+      );
+    });
 
     const formatCurrencyARS = (value) => {
-      const number = Number(value)
-      if (isNaN(number)) return '$ 0,00'
+      const number = Number(value);
+      if (isNaN(number)) return '$ 0,00';
       return new Intl.NumberFormat('es-AR', {
         style: 'currency',
         currency: 'ARS',
         minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      }).format(number)
-    }
+        maximumFractionDigits: 2,
+      }).format(number);
+    };
 
     const formatDate = (timestamp) => {
-      return new Date(timestamp * 1000).toLocaleString('es-AR')
-    }
+      return new Date(timestamp * 1000).toLocaleString('es-AR');
+    };
 
     onMounted(() => {
-      fetchCryptoPrices()
-      intervalId = setInterval(fetchCryptoPrices, 60000)
-    })
+      fetchCryptoPrices();
+      intervalId = setInterval(fetchCryptoPrices, 60000);
+    });
 
     onUnmounted(() => {
-      if (intervalId) clearInterval(intervalId)
-    })
+      if (intervalId) clearInterval(intervalId);
+    });
 
     return {
       prices,
@@ -148,25 +143,14 @@ export default {
       formatDate,
       formatCurrencyARS,
       error,
-      bestExchange
-    }
-  }
-}
+      bestExchange,
+    };
+  },
+};
 </script>
 
 <style scoped>
 .container {
-<<<<<<< HEAD
-=======
-  margin: auto;
-  padding: 20px;
-  border: 1px solid #007bff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  background: #f5f8f9;
-  font-family: Arial, sans-serif;
-  max-width: 800px;
->>>>>>> dev
   margin: auto;
   padding: 20px;
   border: 1px solid #007bff;
