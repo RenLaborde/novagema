@@ -151,7 +151,6 @@ export default {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   background: #f5f8f9;
   font-family: Arial, sans-serif;
-  max-width: 800px;
   text-align: center;
 }
 

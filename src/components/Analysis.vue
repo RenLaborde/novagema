@@ -60,6 +60,7 @@ import { useRouter } from 'vue-router'
 import { useUserStore } from '@/store/user'
 import { getUserTransactions, getCryptoPrice } from '@/services/apiClient'
 import { Pie, Bar, Doughnut } from 'vue-chartjs'
+
 import {
   Chart as ChartJS,
   Title,
