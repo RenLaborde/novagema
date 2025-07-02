@@ -42,7 +42,11 @@
 
             <label>
               ARS:
+<<<<<<< HEAD
               <input :value="formatCurrencyARS(editData.money)" type="text" readonly />
+=======
+              <input v-model.number="editData.money" type="number" step="any" readonly />
+>>>>>>> dev
             </label>
 
             <label>
@@ -57,12 +61,19 @@
           </div>
         </template>
 
+<<<<<<< HEAD
         <!-- View mode -->
+=======
+>>>>>>> dev
         <template v-else>
           <p><strong>Type:</strong> {{ transaction.action === 'purchase' ? 'Buy' : 'Sell' }}</p>
           <p><strong>Crypto:</strong> {{ transaction.crypto_code?.toUpperCase() }}</p>
           <p><strong>Amount:</strong> {{ transaction.crypto_amount }}</p>
+<<<<<<< HEAD
           <p><strong>ARS:</strong> {{ formatCurrencyARS(transaction.money) }}</p>
+=======
+          <p><strong>ARS:</strong> ${{ transaction.money }}</p>
+>>>>>>> dev
           <p><strong>Date:</strong> {{ formatDate(transaction.datetime) }}</p>
 
           <div class="buttons">
@@ -134,7 +145,13 @@ export default {
       if (!this.editData.crypto_code || !this.editData.crypto_amount) return;
       try {
         const price = await getCryptoPrice(this.editData.crypto_code);
+<<<<<<< HEAD
         this.editData.money = price * this.editData.crypto_amount;
+=======
+        this.editData.money = parseFloat(
+          (price * this.editData.crypto_amount).toFixed(2)
+        );
+>>>>>>> dev
       } catch (error) {
         console.error('Error calculating ARS:', error.message);
       }
@@ -165,6 +182,19 @@ export default {
     prevPage() {
       if (this.currentPage > 1) this.currentPage--;
     },
+<<<<<<< HEAD
+=======
+    formatDate(dateStr) {
+      const date = new Date(dateStr);
+      return date.toLocaleString('en-GB', {
+        year: 'numeric',
+        month: 'short',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    },
+>>>>>>> dev
     editTransaction(transaction) {
       this.editData = {
         ...transaction,

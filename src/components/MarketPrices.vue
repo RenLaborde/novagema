@@ -2,6 +2,7 @@
   <div class="container">
     <h2>Market Prices</h2>
     <h4>Real-Time Crypto Prices at Your Fingertips.</h4>
+<<<<<<< HEAD
     <p>Select a cryptocurrency and operation to see where it’s best to trade.</p>
 
     <div class="filters">
@@ -34,6 +35,10 @@
       <strong>{{ formatCurrencyARS(bestExchange.price) }}</strong>
     </p>
 
+=======
+    <p>Check the latest Bitcoin prices across different exchanges in Argentina.</p>
+    <input v-model="searchQuery" placeholder="Search exchange..." class="search-input" />
+>>>>>>> dev
     <table>
       <thead>
         <tr>
@@ -151,6 +156,17 @@ export default {
 
 <style scoped>
 .container {
+<<<<<<< HEAD
+=======
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #007bff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: #f5f8f9;
+  font-family: Arial, sans-serif;
+  max-width: 800px;
+>>>>>>> dev
   margin: auto;
   padding: 20px;
   border: 1px solid #007bff;

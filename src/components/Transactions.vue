@@ -1,6 +1,10 @@
 <template>
   <div class="transactions">
+<<<<<<< HEAD
     <h2>Track Transactions</h2>
+=======
+     <h2>Track Transactions</h2>
+>>>>>>> dev
     <form @submit.prevent="confirmTransaction">
       <label for="transactionType">Transaction Type:</label>
       <select id="transactionType" v-model="action">
@@ -49,7 +53,11 @@
 </template>
 
 <script>
+<<<<<<< HEAD
 import { getCryptoPrice, createTransaction } from '@/services/apiClient';
+=======
+import { getCryptoPrice, createTransaction} from '@/services/apiClient';
+>>>>>>> dev
 import { useUserStore } from '@/store/user';
 
 export default {
