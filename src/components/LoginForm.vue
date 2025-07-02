@@ -1,9 +1,9 @@
 <template>
-  <div class="container d-flex justify-content-center align-items-center vh-100">
-    <div class="card p-4 shadow-lg" style="width: 400px;">
-      <h2 class="text-center mb-4">Login</h2>
-      <p class="text-muted text-center">Enter your Alphanumeric ID</p>
-      
+  <div class="container d-flex justify-content-center align-items-center vh-100 login-bg">
+    <div class="card p-4 shadow-lg nova-card">
+      <h2 class="text-center mb-2 login-title">Log in to NovaGema</h2>
+      <p class="text-muted text-center login-subtitle">Your crystal access to the crypto galaxy 🔮</p>
+
       <form @submit.prevent="handleLogin">
         <div class="mb-3">
           <label for="userId" class="form-label">Alphanumeric ID</label>
@@ -16,7 +16,7 @@
           />
         </div>
 
-        <button type="submit" class="btn btn-primary w-100">Log In</button>
+        <button type="submit" class="btn btn-gema w-100">🔐 Enter</button>
       </form>
 
       <div v-if="errorMessage" class="alert alert-danger mt-3 text-center">
@@ -38,11 +38,10 @@ export default {
     const userId = ref('');
     const errorMessage = ref('');
 
-    // Cargar usuario si está guardado
     onMounted(() => {   
       userId.value = userStore.userId || '';
       if (userStore.userId) {
-        router.push('/dashboard'); // Redirigir si ya está logueado
+        router.push('/dashboard'); 
       }
     });
 
@@ -53,7 +52,7 @@ export default {
       }
 
       userStore.login(userId.value);
-      router.push('/dashboard'); // Redirect to main page
+      router.push('/dashboard'); 
     };
 
     return { userId, errorMessage, handleLogin };
@@ -62,10 +61,39 @@ export default {
 </script>
 
 <style scoped>
-.card {
-  border-radius: 15px;
+.login-bg {
+  background: radial-gradient(circle at top left, #1f004d, #0c001a);
 }
-.form-label {
+
+.nova-card {
+  background-color: #f4f6ff;
+  border-radius: 18px;
+  border: 2px solid #6a5acd33;
+}
+
+.login-title {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #6a5acd;
   font-weight: bold;
+}
+
+.login-subtitle {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.btn-gema {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  font-weight: bold;
+  font-size: 1rem;
+  border-radius: 10px;
+  transition: background 0.3s ease;
+}
+
+.btn-gema:hover {
+  background-color: #0056b3;
 }
 </style>
