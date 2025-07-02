@@ -1,6 +1,6 @@
 <template>
   <div class="transactions">
-     <h2>Track Transactions</h2>
+    <h2>Track Transactions</h2>
     <form @submit.prevent="confirmTransaction">
       <label for="transactionType">Transaction Type:</label>
       <select id="transactionType" v-model="action">
@@ -16,17 +16,33 @@
       </select>
 
       <label for="cryptoAmount">Amount:</label>
-      <input type="number" id="cryptoAmount" v-model="cryptoAmount" step="0.0001" required>
+      <input
+        type="number"
+        id="cryptoAmount"
+        v-model="cryptoAmount"
+        step="0.0001"
+        required
+      />
 
       <div v-if="cryptoPrice !== null">
-        <p>Current Price of {{ cryptoCode.toUpperCase() }}: {{ cryptoPrice }} ARS</p>
+        <p>
+          Current Price of {{ cryptoCode.toUpperCase() }}:
+          {{ formatCurrencyARS(cryptoPrice) }}
+        </p>
       </div>
 
-      <label for="money">{{ action === 'purchase' ? 'Amount to Pay (ARS):' : 'Amount to Receive (ARS):' }}</label>
-      <input type="number" id="money" :value="calculatedMoney" step="0.01" disabled>
+      <label for="money">
+        {{ action === 'purchase' ? 'Amount to Pay (ARS):' : 'Amount to Receive (ARS):' }}
+      </label>
+      <input
+        type="text"
+        id="money"
+        :value="formattedCalculatedMoney"
+        disabled
+      />
 
       <label for="datetime">Date and Time:</label>
-      <input type="datetime-local" id="datetime" v-model="datetime" required>
+      <input type="datetime-local" id="datetime" v-model="datetime" required />
 
       <button
         type="submit"
@@ -42,9 +58,8 @@
 </template>
 
 <script>
-import { getCryptoPrice, createTransaction} from '@/services/apiClient';
+import { getCryptoPrice, createTransaction } from '@/services/apiClient';
 import { useUserStore } from '@/store/user';
-
 
 export default {
   data() {
@@ -58,12 +73,15 @@ export default {
   },
   computed: {
     calculatedMoney() {
-      if (!this.cryptoAmount || !this.cryptoPrice) return '';
-      return (this.cryptoAmount * this.cryptoPrice).toFixed(2);
+      if (!this.cryptoAmount || !this.cryptoPrice) return 0;
+      return this.cryptoAmount * this.cryptoPrice;
+    },
+    formattedCalculatedMoney() {
+      return this.formatCurrencyARS(this.calculatedMoney);
     }
   },
   watch: {
-    cryptoCode: "fetchCryptoPrice"
+    cryptoCode: 'fetchCryptoPrice'
   },
   methods: {
     async fetchCryptoPrice() {
@@ -75,37 +93,48 @@ export default {
       }
     },
 
+    formatCurrencyARS(value) {
+      const number = Number(value);
+      if (isNaN(number)) return '$ 0,00';
+      return new Intl.NumberFormat('es-AR', {
+        style: 'currency',
+        currency: 'ARS',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format(number);
+    },
+
     async confirmTransaction() {
-    const userStore = useUserStore();
-    const userId = userStore.userId;
+      const userStore = useUserStore();
+      const userId = userStore.userId;
 
-    const transactionData = {
-      user_id: userId,
-      action: this.action,
-      crypto_code: this.cryptoCode,
-      crypto_amount: parseFloat(this.cryptoAmount),
-      money: parseFloat(this.calculatedMoney),
-      datetime: this.datetime,
-    };
+      const transactionData = {
+        user_id: userId,
+        action: this.action,
+        crypto_code: this.cryptoCode,
+        crypto_amount: parseFloat(this.cryptoAmount),
+        money: parseFloat(this.calculatedMoney),
+        datetime: this.datetime,
+      };
 
-    try {
-      await createTransaction(transactionData);
-      alert('Transaction successfully confirmed!');
-      this.resetForm(); // sugerido
-    } catch (err) {
-      alert('Error submitting transaction');
-      console.error(err);
+      try {
+        await createTransaction(transactionData);
+        alert('Transaction successfully confirmed!');
+        this.resetForm();
+      } catch (err) {
+        alert('Error submitting transaction');
+        console.error(err);
+      }
+    },
+
+    resetForm() {
+      this.cryptoCode = 'btc';
+      this.cryptoAmount = '';
+      this.datetime = '';
+      this.action = 'purchase';
+      this.cryptoPrice = null;
     }
   },
-
-  resetForm() {
-    this.cryptoCode = 'btc';
-    this.cryptoAmount = '';
-    this.datetime = '';
-    this.action = 'purchase';
-    this.cryptoPrice = null;
-  }
-},
   created() {
     this.fetchCryptoPrice();
   }
@@ -132,7 +161,8 @@ label {
   margin-top: 10px;
 }
 
-input, select {
+input,
+select {
   width: 100%;
   padding: 8px;
   margin: 5px 0;

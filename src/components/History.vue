@@ -9,6 +9,7 @@
         :key="transaction._id"
         class="transaction-card"
       >
+        <!-- Edit mode -->
         <template v-if="editMode && editData._id === transaction._id">
           <h3>Edit Transaction</h3>
           <div class="edit-form">
@@ -41,7 +42,7 @@
 
             <label>
               ARS:
-              <input v-model.number="editData.money" type="number" step="any" readonly />
+              <input :value="formatCurrencyARS(editData.money)" type="text" readonly />
             </label>
 
             <label>
@@ -56,11 +57,12 @@
           </div>
         </template>
 
+        <!-- View mode -->
         <template v-else>
           <p><strong>Type:</strong> {{ transaction.action === 'purchase' ? 'Buy' : 'Sell' }}</p>
           <p><strong>Crypto:</strong> {{ transaction.crypto_code?.toUpperCase() }}</p>
           <p><strong>Amount:</strong> {{ transaction.crypto_amount }}</p>
-          <p><strong>ARS:</strong> ${{ transaction.money }}</p>
+          <p><strong>ARS:</strong> {{ formatCurrencyARS(transaction.money) }}</p>
           <p><strong>Date:</strong> {{ formatDate(transaction.datetime) }}</p>
 
           <div class="buttons">
@@ -139,21 +141,31 @@ export default {
         console.error('Error calculating ARS:', error.message);
       }
     },
-    nextPage() {
-      if (this.currentPage < this.totalPages) this.currentPage++;
-    },
-    prevPage() {
-      if (this.currentPage > 1) this.currentPage--;
+    formatCurrencyARS(value) {
+      const number = Number(value);
+      if (isNaN(number)) return '$ 0,00';
+      return new Intl.NumberFormat('es-AR', {
+        style: 'currency',
+        currency: 'ARS',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }).format(number);
     },
     formatDate(dateStr) {
       const date = new Date(dateStr);
-      return date.toLocaleString('en-GB', {
+      return date.toLocaleString('es-AR', {
         year: 'numeric',
         month: 'short',
         day: '2-digit',
         hour: '2-digit',
         minute: '2-digit'
       });
+    },
+    nextPage() {
+      if (this.currentPage < this.totalPages) this.currentPage++;
+    },
+    prevPage() {
+      if (this.currentPage > 1) this.currentPage--;
     },
     editTransaction(transaction) {
       this.editData = {
