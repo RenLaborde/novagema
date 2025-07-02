@@ -16,10 +16,19 @@
       </select>
 
       <label for="cryptoAmount">Amount:</label>
-      <input type="number" id="cryptoAmount" v-model="cryptoAmount" step="0.0001" required>
+      <input
+        type="number"
+        id="cryptoAmount"
+        v-model="cryptoAmount"
+        step="0.0001"
+        required
+      />
 
       <div v-if="cryptoPrice !== null">
-        <p>Current Price of {{ cryptoCode.toUpperCase() }}: {{ formatCurrencyARS(cryptoPrice) }}</p>
+        <p>
+          Current Price of {{ cryptoCode.toUpperCase() }}:
+          {{ formatCurrencyARS(cryptoPrice) }}
+        </p>
       </div>
 
       <label for="money">
@@ -30,10 +39,10 @@
         id="money"
         :value="formattedCalculatedMoney"
         disabled
-      >
+      />
 
       <label for="datetime">Date and Time:</label>
-      <input type="datetime-local" id="datetime" v-model="datetime" required>
+      <input type="datetime-local" id="datetime" v-model="datetime" required />
 
       <button
         type="submit"
@@ -72,7 +81,7 @@ export default {
     }
   },
   watch: {
-    cryptoCode: "fetchCryptoPrice"
+    cryptoCode: 'fetchCryptoPrice'
   },
   methods: {
     async fetchCryptoPrice() {
@@ -85,12 +94,14 @@ export default {
     },
 
     formatCurrencyARS(value) {
+      const number = Number(value);
+      if (isNaN(number)) return '$ 0,00';
       return new Intl.NumberFormat('es-AR', {
         style: 'currency',
         currency: 'ARS',
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
-      }).format(value);
+      }).format(number);
     },
 
     async confirmTransaction() {
@@ -140,7 +151,6 @@ export default {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   background: #f5f8f9;
   font-family: Arial, sans-serif;
-  max-width: 800px;
   text-align: center;
 }
 
@@ -150,7 +160,8 @@ label {
   margin-top: 10px;
 }
 
-input, select {
+input,
+select {
   width: 100%;
   padding: 8px;
   margin: 5px 0;

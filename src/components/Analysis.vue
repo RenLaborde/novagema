@@ -79,6 +79,7 @@ const goDashboard = () => router.push('/dashboard')
 
 const userStore = useUserStore()
 const userId = userStore.userId
+
 const transactions = ref([])
 const cryptoData = ref({})
 const totalValue = ref(0)
@@ -86,6 +87,10 @@ const totalValue = ref(0)
 const chartData = ref({ labels: [], datasets: [] })
 const barChartData = ref({ labels: [], datasets: [] })
 const doughnutData = ref({ labels: [], datasets: [] })
+
+const totalSpentTotal = computed(() => {
+  return Object.values(cryptoData.value).reduce((sum, entry) => sum + entry.totalSpent, 0)
+})
 
 const formatCurrency = (value) => {
   const n = Number(value)
@@ -99,10 +104,6 @@ const formatCurrency = (value) => {
 const getResultClass = (value, spent) => {
   return value - spent >= 0 ? 'positive' : 'negative'
 }
-
-const totalSpentTotal = computed(() => {
-  return Object.values(cryptoData.value).reduce((sum, entry) => sum + entry.totalSpent, 0)
-})
 
 const fetchTransactions = async () => {
   if (!userId) return
@@ -214,7 +215,6 @@ onMounted(fetchTransactions)
   font-family: Arial, sans-serif;
   text-align: center;
 }
-
 .header {
   display: flex;
   align-items: center;

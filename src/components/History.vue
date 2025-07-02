@@ -9,6 +9,7 @@
         :key="transaction._id"
         class="transaction-card"
       >
+        <!-- Edit mode -->
         <template v-if="editMode && editData._id === transaction._id">
           <h3>Edit Transaction</h3>
           <div class="edit-form">

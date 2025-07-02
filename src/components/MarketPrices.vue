@@ -85,7 +85,6 @@ export default {
 
     const findBestExchange = () => {
       let best = null;
-
       for (const [exchange, data] of Object.entries(prices.value)) {
         const value = operation.value === 'buy' ? data.ask : data.bid;
         if (!value) continue;
@@ -97,7 +96,6 @@ export default {
           best = { name: exchange, price: value };
         }
       }
-
       bestExchange.value = best;
     };
 
@@ -140,8 +138,8 @@ export default {
       operation,
       searchQuery,
       filteredPrices,
-      formatDate,
       formatCurrencyARS,
+      formatDate,
       error,
       bestExchange,
     };
@@ -153,55 +151,76 @@ export default {
 .container {
   margin: auto;
   padding: 20px;
+  max-width: 800px;
   border: 1px solid #007bff;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   background: #f5f8f9;
   font-family: Arial, sans-serif;
-  max-width: 800px;
   text-align: center;
 }
+
 .filters {
   display: flex;
-  gap: 15px;
   flex-wrap: wrap;
+  gap: 10px;
   justify-content: center;
-  margin-bottom: 10px;
+  margin: 20px 0;
 }
-.filters label {
+
+label {
+  display: flex;
+  flex-direction: column;
   font-weight: bold;
 }
+
 .search-input {
   padding: 8px;
+  width: 200px;
   border: 1px solid #ddd;
   border-radius: 5px;
 }
+
 table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 10px;
 }
+
 th,
 td {
   border: 1px solid #ddd;
   padding: 10px;
   text-align: center;
 }
+
 th {
   background-color: #007bff;
   color: white;
 }
+
 .buy-price {
   color: green;
   font-weight: bold;
 }
+
 .sell-price {
   color: red;
   font-weight: bold;
 }
+
 .error {
   color: red;
   margin-top: 10px;
   font-weight: bold;
+}
+
+@media (max-width: 600px) {
+  .filters {
+    flex-direction: column;
+    align-items: center;
+  }
+  table {
+    font-size: 0.9rem;
+  }
 }
 </style>
