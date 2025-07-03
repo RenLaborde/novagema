@@ -190,7 +190,7 @@ export default {
           action: this.editData.action,
           crypto_code,
           crypto_amount: parseFloat(crypto_amount),
-          money: parseFloat(money),
+          money: parseFloat(parseFloat(money).toFixed(2)),
           datetime: new Date(datetime).toISOString(),
           user_id: this.userId
         };

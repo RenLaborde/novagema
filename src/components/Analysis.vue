@@ -135,6 +135,7 @@ const processData = async () => {
     const code = t.crypto_code
     const amount = parseFloat(t.crypto_amount)
     const money = parseFloat(t.money)
+
     if (!cryptoData.value[code]) {
       cryptoData.value[code] = { amount: 0, totalSpent: 0, totalValue: 0 }
     }
@@ -155,13 +156,14 @@ const processData = async () => {
 
   for (const code in cryptoData.value) {
     const entry = cryptoData.value[code]
-    entry.totalValue = entry.amount * prices[code]
+    entry.totalValue = parseFloat((entry.amount * prices[code]).toFixed(2))
+    entry.totalSpent = parseFloat(entry.totalSpent.toFixed(2))
     totalValue.value += entry.totalValue
 
     labels.push(code.toUpperCase())
     values.push(entry.totalValue)
     invested.push(entry.totalSpent)
-    profits.push(entry.totalValue - entry.totalSpent)
+    profits.push(parseFloat((entry.totalValue - entry.totalSpent).toFixed(2)))
   }
 
   chartData.value = {
