@@ -108,13 +108,14 @@ export default {
       const userStore = useUserStore();
       const userId = userStore.userId;
 
+      const rawDatetime = new Date(this.datetime).toISOString();
       const transactionData = {
         user_id: userId,
         action: this.action,
         crypto_code: this.cryptoCode,
         crypto_amount: parseFloat(this.cryptoAmount),
-        money: parseFloat(this.calculatedMoney),
-        datetime: this.datetime,
+        money: parseFloat(this.calculatedMoney.toFixed(2)),
+        datetime: rawDatetime
       };
 
       try {
